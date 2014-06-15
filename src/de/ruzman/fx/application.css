@@ -1,0 +1,53 @@
+#root {
+	-fx-background-color: null;
+}
+
+#frame {
+	-fx-background-color: white;
+}
+
+#scalePane {
+	-fx-fill: null;
+	-fx-stroke: transparent;
+    -fx-stroke-width: 5;
+    -fx-stroke-type: inside;
+}
+
+#iconify, #maximize, #close {
+	-fx-background-insets: null;
+	-fx-background-radius: null;
+	-fx-border: null;
+	-fx-radius: 0;
+}
+
+#maximize.maximize {
+	-fx-background-image: url('maximize.png');
+}
+
+#maximize.maximize:hover {
+	-fx-background-image: url('maximizeHover.png');
+}
+
+#maximize.minimize {
+	-fx-background-image: url('minimize.png');
+}
+
+#maximize.minimize:hover {
+	-fx-background-image: url('minimizeHover.png');
+}
+
+#iconify {
+	-fx-background-image: url('iconify.png');
+}
+
+#iconify:hover {
+	-fx-background-image: url('iconifyHover.png');
+}
+
+#close {
+	-fx-background-image: url('close.png');
+}
+
+#close:hover {
+	-fx-background-image: url('closeHover.png');
+}

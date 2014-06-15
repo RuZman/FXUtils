@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="Neues Dokument 1">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.35"
+     inkscape:cx="-209.25768"
+     inkscape:cy="170.91813"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1028"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#e04343;fill-opacity:1;stroke:none"
+       id="rect2985"
+       width="300"
+       height="250"
+       x="80"
+       y="283.79074"
+       inkscape:export-filename="C:\Users\Zooo\closeHover.png"
+       inkscape:export-xdpi="9"
+       inkscape:export-ydpi="9" />
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:30;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="M 171.16862,358.88636 288.08469,463.49548"
+       id="path3766"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\Users\Zooo\closeHover.png"
+       inkscape:export-xdpi="9"
+       inkscape:export-ydpi="9" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path3779"
+       d="M 171.16862,463.49548 288.08469,358.88636"
+       style="fill:none;stroke:#ffffff;stroke-width:30;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:export-filename="C:\Users\Zooo\closeHover.png"
+       inkscape:export-xdpi="9"
+       inkscape:export-ydpi="9" />
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:none"
+       id="rect2985-1"
+       width="300"
+       height="250"
+       x="450.03061"
+       y="285.91531"
+       inkscape:export-filename="C:\Users\Zooo\close.png"
+       inkscape:export-xdpi="9"
+       inkscape:export-ydpi="9" />
+    <path
+       style="fill:none;stroke:#cccccc;stroke-width:30;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="M 541.19923,361.01093 658.1153,465.62006"
+       id="path3766-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\Users\Zooo\close.png"
+       inkscape:export-xdpi="9"
+       inkscape:export-ydpi="9" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path3779-4"
+       d="M 541.19923,465.62006 658.1153,361.01093"
+       style="fill:none;stroke:#cccccc;stroke-width:30;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:export-filename="C:\Users\Zooo\close.png"
+       inkscape:export-xdpi="9"
+       inkscape:export-ydpi="9" />
+    <rect
+       style="fill:#000000;fill-opacity:0;stroke:none"
+       id="rect2985-0"
+       width="300"
+       height="250"
+       x="75.264023"
+       y="574.81897"
+       inkscape:export-filename="C:\Users\Zooo\minimize.png"
+       inkscape:export-xdpi="9"
+       inkscape:export-ydpi="9" />
+    <path
+       style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:24;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
+       d="m 160.20937,631.21165 0,12 0,6.6875 0,11.15625 0,95.875 0,0.84375 0,11.15625 11.125,0 0.875,0 114.5625,0 11.125,0 0,-11.15625 0,-96.71875 0,-11.15625 0,-6.6875 0,-12 -12,0 -113.6875,0 -12,0 z m 24,41 89.6875,0 0,72.71875 -89.6875,0 0,-72.71875 z"
+       id="rect3852"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\Users\Zooo\minimize.png"
+       inkscape:export-xdpi="9"
+       inkscape:export-ydpi="9" />
+    <rect
+       style="fill:#eeeeee;fill-opacity:1;stroke:none"
+       id="rect2985-0-4"
+       width="300"
+       height="250"
+       x="465.71426"
+       y="604.50507"
+       inkscape:export-filename="C:\Users\Zooo\minimizeHover.png"
+       inkscape:export-xdpi="9"
+       inkscape:export-ydpi="9" />
+    <path
+       style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#333333;fill-opacity:1;stroke:none;stroke-width:24;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
+       d="m 550.65963,660.89772 0,12 0,6.6875 0,11.15625 0,95.875 0,0.84375 0,11.15625 11.125,0 0.875,0 114.5625,0 11.125,0 0,-11.15625 0,-96.71875 0,-11.15625 0,-6.6875 0,-12 -12,0 -113.6875,0 -12,0 z m 24,41 89.6875,0 0,72.71875 -89.6875,0 0,-72.71875 z"
+       id="rect3852-8"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\Users\Zooo\minimizeHover.png"
+       inkscape:export-xdpi="9"
+       inkscape:export-ydpi="9" />
+    <rect
+       style="fill:#eeeeee;fill-opacity:1;stroke:none"
+       id="rect2985-0-4-8"
+       width="300"
+       height="250"
+       x="474.28571"
+       y="931.64783"
+       inkscape:export-filename="C:\Users\Zooo\maximizeHover.png"
+       inkscape:export-xdpi="9"
+       inkscape:export-ydpi="9" />
+    <path
+       style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#333333;fill-opacity:1;stroke:none;stroke-width:24;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
+       d="m 577.94027,966.71709 0,11.12866 0,6.20191 0,10.34618 0,88.91326 0,0.7825 0,10.3462 10.3172,0 0.81146,0 106.24392,0 10.31719,0 0,-10.3462 0,-89.69576 0,-10.34618 0,-6.20191 0,-11.12866 -11.12866,0 -105.43245,0 -11.12866,0 z m 22.25732,38.02291 83.17513,0 0,67.4384 -83.17513,0 0,-67.4384 z"
+       id="rect3852-4-5-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\Users\Zooo\maximizeHover.png"
+       inkscape:export-xdpi="9"
+       inkscape:export-ydpi="9" />
+    <path
+       style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#333333;fill-opacity:1;stroke:none;stroke-width:24;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
+       d="m 542.94139,1016.0028 0,11.1286 0,6.2019 0,10.3462 0,88.9133 0,0.7825 0,10.3462 10.3172,0 0.81146,0 106.24392,0 10.31719,0 0,-10.3462 0,-89.6958 0,-10.3462 0,-6.2019 0,-11.1286 -11.12866,0 -105.43245,0 -11.12866,0 z m 22.25732,38.0229 83.17513,0 0,67.4384 -83.17513,0 0,-67.4384 z"
+       id="rect3852-4-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\Users\Zooo\maximizeHover.png"
+       inkscape:export-xdpi="9"
+       inkscape:export-ydpi="9" />
+    <rect
+       style="fill:#000000;fill-opacity:0;stroke:none"
+       id="rect2985-0-4-8-7"
+       width="300"
+       height="250"
+       x="82.85714"
+       y="927.36218"
+       inkscape:export-filename="C:\Users\Zooo\maximize.png"
+       inkscape:export-xdpi="9"
+       inkscape:export-ydpi="9" />
+    <path
+       style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:24;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
+       d="m 186.51171,962.43144 0,11.12866 0,6.20191 0,10.34618 0,88.91321 0,0.7825 0,10.3462 10.3172,0 0.81146,0 106.24392,0 10.31719,0 0,-10.3462 0,-89.69571 0,-10.34618 0,-6.20191 0,-11.12866 -11.12866,0 -105.43245,0 -11.12866,0 z m 22.25732,38.02296 83.17513,0 0,67.4383 -83.17513,0 0,-67.4383 z"
+       id="rect3852-4-5-5-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\Users\Zooo\maximize.png"
+       inkscape:export-xdpi="9"
+       inkscape:export-ydpi="9" />
+    <path
+       style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:24;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
+       d="m 151.51283,1011.7172 0,11.1286 0,6.2019 0,10.3462 0,88.9132 0,0.7825 0,10.3462 10.3172,0 0.81146,0 106.24392,0 10.31719,0 0,-10.3462 0,-89.6957 0,-10.3462 0,-6.2019 0,-11.1286 -11.12866,0 -105.43245,0 -11.12866,0 z m 22.25732,38.0229 83.17513,0 0,67.4383 -83.17513,0 0,-67.4383 z"
+       id="rect3852-4-1-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\Users\Zooo\maximize.png"
+       inkscape:export-xdpi="9"
+       inkscape:export-ydpi="9" />
+    <rect
+       style="fill:#eeeeee;fill-opacity:1;stroke:none"
+       id="rect2985-0-4-5"
+       width="300"
+       height="250"
+       x="62.857143"
+       y="1264.505"
+       inkscape:export-filename="C:\Users\Zooo\iconifyHover.png"
+       inkscape:export-xdpi="9"
+       inkscape:export-ydpi="9" />
+    <path
+       style="fill:#333333;stroke:#333333;stroke-width:30;stroke-linecap:square;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;fill-opacity:1"
+       d="m 158.57143,1446.6479 114.28571,0"
+       id="path4042"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\Users\Zooo\iconifyHover.png"
+       inkscape:export-xdpi="9"
+       inkscape:export-ydpi="9" />
+    <rect
+       style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-opacity:0"
+       id="rect2985-0-4-5-7"
+       width="300"
+       height="250"
+       x="491.42856"
+       y="1255.9336"
+       inkscape:export-filename="C:\Users\Zooo\iconify.png"
+       inkscape:export-xdpi="9"
+       inkscape:export-ydpi="9" />
+    <path
+       style="fill:#cccccc;fill-opacity:1;stroke:#cccccc;stroke-width:30;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 587.14286,1438.0765 114.28571,0"
+       id="path4042-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\Users\Zooo\iconify.png"
+       inkscape:export-xdpi="9"
+       inkscape:export-ydpi="9" />
+  </g>
+</svg>
