@@ -31,8 +31,9 @@ public class FrameController implements Initializable {
 	public enum State {
 		NONE, DRAG, RESIZE, MAXIMIZE
 	} private State state = State.NONE;
-	private Rectangle2D oldBounds;
-	private Stage primaryStage;
+	protected Rectangle2D oldBounds;
+	protected Stage primaryStage;
+	protected boolean isDocked;
 	
 	// FIXME: Konstanten Global nutzen (CSS + FXML)
 	public static final int SHADOW_SIZE = 15;
@@ -93,9 +94,10 @@ public class FrameController implements Initializable {
 		        			primaryStage.getY(), primaryStage.getWidth(), primaryStage.getHeight());
 		            Screen screen = screensForRectangle.get(0);
 
-		            oldBounds = new Rectangle2D(primaryStage.getX(), primaryStage.getY(),
-							primaryStage.getWidth(), primaryStage.getHeight());
-		            
+		            if(!isDocked) {
+		            	oldBounds = new Rectangle2D(primaryStage.getX(), primaryStage.getY(),
+		            			primaryStage.getWidth(), primaryStage.getHeight());
+		            }
 		        	scale(screen.getVisualBounds());
 		            
 		            root.setTranslateX(0);
@@ -109,8 +111,8 @@ public class FrameController implements Initializable {
 					// FIXME: Doppelklick zum Kleiner machen und gleichzeitig verschieben:
 		        	mapFrameToStage();
 		        	
-		            root.setTranslateX(SHADOW_SIZE/2);
-		            root.setTranslateY(SHADOW_SIZE/2);
+		            root.setTranslateX(HALF_SHADOW_SIZE);
+		            root.setTranslateY(HALF_SHADOW_SIZE);
 		            root.getChildren().add(scalePane);
 		            
 		            scale(oldBounds);
@@ -130,7 +132,7 @@ public class FrameController implements Initializable {
 	}
 	
 	public void onFrameDragged(double x, double y) {
-		if(state == State.DRAG && !primaryStage.isMaximized()) {
+		if(state == State.DRAG && !primaryStage.isMaximized() && !isDocked) {
             root.getScene().getWindow().setX(x - oldBounds.getMinX());
             root.getScene().getWindow().setY(y - oldBounds.getMinY());
 		}
@@ -156,6 +158,23 @@ public class FrameController implements Initializable {
 			oldBounds = new Rectangle2D(primaryStage.getX(), primaryStage.getY(),
 					primaryStage.getWidth(), primaryStage.getHeight());
 		}
+	}
+	
+    private void onVerticalFrameResize(EnumSet<ResizeDirection> direction) {
+    	if(primaryStage.isResizable() && (direction.contains(ResizeDirection.SOUTH) || 
+    			direction.contains(ResizeDirection.NORTH))) {
+            oldBounds = new Rectangle2D(primaryStage.getX(), primaryStage.getY(),
+					primaryStage.getWidth(), primaryStage.getHeight());
+    		
+    		isDocked = true;
+        	ObservableList<Screen> screensForRectangle = Screen.getScreensForRectangle(primaryStage.getX(),
+        			primaryStage.getY(), primaryStage.getWidth(), primaryStage.getHeight());
+            Screen screen = screensForRectangle.get(0);
+            
+        	scale(new Rectangle2D(primaryStage.getX(), 0, primaryStage.getWidth(), screen.getVisualBounds().getHeight()+SHADOW_SIZE*3/2));
+            root.setTranslateY(0);
+
+    	}
 	}
 	
     public void onFrameResize(EnumSet<ResizeDirection> direction, double screenX, double screenY) {
@@ -203,8 +222,8 @@ public class FrameController implements Initializable {
     	if(primaryStage.isMaximized()) {
     		frame.setPrefSize(primaryStage.getWidth(), primaryStage.getHeight());
     	} else {
-    		frame.setPrefSize(primaryStage.getWidth()-SHADOW_SIZE*3/2,
-    				primaryStage.getHeight()-SHADOW_SIZE*3/2);
+    		frame.setPrefSize(primaryStage.getWidth()-HALF_SHADOW_SIZE*3,
+    				primaryStage.getHeight()-HALF_SHADOW_SIZE*3);
     	}
     }
 	
@@ -217,8 +236,17 @@ public class FrameController implements Initializable {
     }
     
     @FXML private void maximizeWindowOnDoubleCLick(MouseEvent me) {
-        if (me.getButton().equals(MouseButton.PRIMARY) && me.getClickCount() == 2) {        
-        	primaryStage.setMaximized(!primaryStage.isMaximized());
+        if (me.getButton().equals(MouseButton.PRIMARY) && me.getClickCount() == 2) {
+    		// FIXME: Logik in public-Methode verlagern
+        	if(isDocked) {
+        		root.setTranslateY(HALF_SHADOW_SIZE);
+        		scale(oldBounds);
+        		mapFrameToStage();
+        		isDocked = false;
+        	} else {
+        		primaryStage.setMaximized(!primaryStage.isMaximized());
+        	}
+        	
        }
     }
     
@@ -272,11 +300,15 @@ public class FrameController implements Initializable {
     
     @FXML private void activateFrameResize(MouseEvent me) {
     	if(me.getButton() == MouseButton.PRIMARY) {
-    		activateFrameResize();
+    		if(me.getClickCount() == 2) {
+    			onVerticalFrameResize(direction);
+    		} else {
+        		activateFrameResize();
+    		}
     	}
     }
-    
-    @FXML private void onFrameResize(MouseEvent me) {
+
+	@FXML private void onFrameResize(MouseEvent me) {
     	if(me.getButton() == MouseButton.PRIMARY && !direction.isEmpty()) {
         	onFrameResize(direction, me.getScreenX(), me.getScreenY());
     	}

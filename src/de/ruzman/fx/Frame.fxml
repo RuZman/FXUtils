@@ -7,13 +7,13 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.HBox?>
-<?import de.ruzman.modernfx.FrameController?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.layout.Region?>
+<?import de.ruzman.fx.FrameController?>
 
 <Group fx:id="root" onMousePressed="#activateFrameDragged" onMouseDragged="#onFrameDragged"  onMouseReleased="#deactivateFrameDragged"
-		xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.ruzman.modernfx.FrameController">
+		xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.ruzman.fx.FrameController">
    <children>
    	<BorderPane fx:id="frame">
    		<top>
