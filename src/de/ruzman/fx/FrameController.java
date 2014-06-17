@@ -10,6 +10,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -29,9 +30,10 @@ public class FrameController implements Initializable {
 		NORTH, EAST, SOUTH, WEST
 	} private EnumSet<ResizeDirection> direction = EnumSet.noneOf(ResizeDirection.class);
 	public enum State {
-		NONE, DRAG, RESIZE, MAXIMIZE
+		NONE, DRAG, RESIZE
 	} private State state = State.NONE;
 	protected Rectangle2D oldBounds;
+	protected Point2D draggedPosition;
 	protected Stage primaryStage;
 	protected boolean isDocked;
 	
@@ -106,9 +108,10 @@ public class FrameController implements Initializable {
 					
 					maximize.getStyleClass().remove("maximize");
 					maximize.getStyleClass().add("minimize");
+					
+					isDocked = false;
 				// isMaximized: true -> false
 				} else if(oldValue.booleanValue() && !newValue.booleanValue()) {
-					// FIXME: Doppelklick zum Kleiner machen und gleichzeitig verschieben:
 		        	mapFrameToStage();
 		        	
 		            root.setTranslateX(HALF_SHADOW_SIZE);
@@ -127,14 +130,17 @@ public class FrameController implements Initializable {
 	public synchronized void activateWindowDragged(double x, double y) {
 		if(state == State.NONE) {
 			state = State.DRAG;
-			oldBounds = new Rectangle2D(x, y, 0, 0);
+			draggedPosition = new Point2D(x, y);
+
 		}
 	}
 	
 	public void onWindowDragged(double x, double y) {
-		if(state == State.DRAG && !primaryStage.isMaximized() && !isDocked) {
-            root.getScene().getWindow().setX(x - oldBounds.getMinX());
-            root.getScene().getWindow().setY(y - oldBounds.getMinY());
+		if(state == State.DRAG && !primaryStage.isMaximized()) {			
+			if(!isDocked) {
+	            root.getScene().getWindow().setY(y - draggedPosition.getY());
+			}
+            root.getScene().getWindow().setX(x - draggedPosition.getX());
 		}
 	}
 	
@@ -155,35 +161,55 @@ public class FrameController implements Initializable {
 	public synchronized void activateWindowResize() {
 		if(state == State.NONE) {
 			state = State.RESIZE;
-			oldBounds = new Rectangle2D(primaryStage.getX(), primaryStage.getY(),
+        	if(!(isDocked && (direction.contains(ResizeDirection.NORTH) 
+        			|| direction.contains(ResizeDirection.SOUTH)))) {
+        		oldBounds = new Rectangle2D(primaryStage.getX(), primaryStage.getY(),
 					primaryStage.getWidth(), primaryStage.getHeight());
+        	}
 		}
 	}
 	
     private void onVerticalWindowResize(EnumSet<ResizeDirection> direction) {
+    	// FIXME: Vertical Resize - SOUTH funktioniert nicht.
     	if(primaryStage.isResizable() && (direction.contains(ResizeDirection.SOUTH) || 
     			direction.contains(ResizeDirection.NORTH))) {
-            oldBounds = new Rectangle2D(primaryStage.getX(), primaryStage.getY(),
-					primaryStage.getWidth(), primaryStage.getHeight());
-    		
-    		isDocked = true;
-        	ObservableList<Screen> screensForRectangle = Screen.getScreensForRectangle(primaryStage.getX(),
-        			primaryStage.getY(), primaryStage.getWidth(), primaryStage.getHeight());
-            Screen screen = screensForRectangle.get(0);
-            
-        	scale(new Rectangle2D(primaryStage.getX(), 0, primaryStage.getWidth(), screen.getVisualBounds().getHeight()+SHADOW_SIZE*3/2));
-            root.setTranslateY(0);
-
+    		if(isDocked) {
+    			root.setTranslateY(HALF_SHADOW_SIZE);
+                scale(new Rectangle2D(oldBounds.getMinX(), oldBounds.getMinY(), oldBounds.getWidth(), oldBounds.getHeight()));
+                isDocked = false;
+    		} else {
+	            oldBounds = new Rectangle2D(primaryStage.getX(), primaryStage.getY(),
+						primaryStage.getWidth(), primaryStage.getHeight());
+	    		
+	    		isDocked = true;
+	        	ObservableList<Screen> screensForRectangle = Screen.getScreensForRectangle(primaryStage.getX(),
+	        			primaryStage.getY(), primaryStage.getWidth(), primaryStage.getHeight());
+	            Screen screen = screensForRectangle.get(0);
+	            
+	        	scale(new Rectangle2D(primaryStage.getX(), 0, primaryStage.getWidth(), screen.getVisualBounds().getHeight()+SHADOW_SIZE*3/2));
+	            root.setTranslateY(0);
+    		}
     	}
 	}
 	
     public void onWindowResize(EnumSet<ResizeDirection> direction, double screenX, double screenY) {
-    	// FIXME: Minimum beim Resize beachten
-        if(primaryStage.isResizable() && state == State.RESIZE) {
+    	// FIXME: Minimum beim Resize beachten    	
+        if(primaryStage.isResizable() && state == State.RESIZE) {   	
         	double x = primaryStage.getX();
         	double y = primaryStage.getY();
         	double w = primaryStage.getWidth();
         	double h = primaryStage.getHeight();
+        	
+        	if(isDocked && (direction.contains(ResizeDirection.NORTH) 
+        			|| direction.contains(ResizeDirection.SOUTH))) {
+        		root.setTranslateY(HALF_SHADOW_SIZE); 
+        		
+        		x = oldBounds.getMinX();
+        		y = oldBounds.getMinY();
+            	w = oldBounds.getWidth();
+            	h = oldBounds.getHeight();
+        		isDocked = false;
+        	}
         	
         	if(direction.contains(ResizeDirection.WEST)) {
         		x = screenX - HALF_SHADOW_SIZE;
@@ -246,7 +272,6 @@ public class FrameController implements Initializable {
         	} else {
         		primaryStage.setMaximized(!primaryStage.isMaximized());
         	}
-        	
        }
     }
     
@@ -305,6 +330,7 @@ public class FrameController implements Initializable {
     		} else {
         		activateWindowResize();
     		}
+			me.consume();
     	}
     }
 
