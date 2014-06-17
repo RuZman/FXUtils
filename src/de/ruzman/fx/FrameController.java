@@ -27,7 +27,7 @@ import javafx.stage.StageStyle;
 public class FrameController implements Initializable {
 	public enum ResizeDirection {
 		NORTH, EAST, SOUTH, WEST
-	} private EnumSet<ResizeDirection> direction = EnumSet.of(ResizeDirection.NORTH);
+	} private EnumSet<ResizeDirection> direction = EnumSet.noneOf(ResizeDirection.class);
 	public enum State {
 		NONE, DRAG, RESIZE, MAXIMIZE
 	} private State state = State.NONE;
@@ -49,8 +49,8 @@ public class FrameController implements Initializable {
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {		
-        root.setTranslateX(SHADOW_SIZE/2);
-        root.setTranslateY(SHADOW_SIZE/2);
+        root.setTranslateX(HALF_SHADOW_SIZE);
+        root.setTranslateY(HALF_SHADOW_SIZE);
 		
         topBar.prefWidthProperty().bind(frame.widthProperty());
         scalePane.widthProperty().bind(frame.widthProperty());
@@ -124,21 +124,21 @@ public class FrameController implements Initializable {
 		});
 	}
 
-	public synchronized void activateFrameDragged(double x, double y) {
+	public synchronized void activateWindowDragged(double x, double y) {
 		if(state == State.NONE) {
 			state = State.DRAG;
 			oldBounds = new Rectangle2D(x, y, 0, 0);
 		}
 	}
 	
-	public void onFrameDragged(double x, double y) {
+	public void onWindowDragged(double x, double y) {
 		if(state == State.DRAG && !primaryStage.isMaximized() && !isDocked) {
             root.getScene().getWindow().setX(x - oldBounds.getMinX());
             root.getScene().getWindow().setY(y - oldBounds.getMinY());
 		}
 	}
 	
-	public void deactivateFrameDragged() {
+	public void deactivateWindowDragged() {
 		if(state == State.DRAG) {
 			state = State.NONE;
 		}
@@ -152,7 +152,7 @@ public class FrameController implements Initializable {
 		primaryStage.setIconified(true);
 	}
     
-	public synchronized void activateFrameResize() {
+	public synchronized void activateWindowResize() {
 		if(state == State.NONE) {
 			state = State.RESIZE;
 			oldBounds = new Rectangle2D(primaryStage.getX(), primaryStage.getY(),
@@ -160,7 +160,7 @@ public class FrameController implements Initializable {
 		}
 	}
 	
-    private void onVerticalFrameResize(EnumSet<ResizeDirection> direction) {
+    private void onVerticalWindowResize(EnumSet<ResizeDirection> direction) {
     	if(primaryStage.isResizable() && (direction.contains(ResizeDirection.SOUTH) || 
     			direction.contains(ResizeDirection.NORTH))) {
             oldBounds = new Rectangle2D(primaryStage.getX(), primaryStage.getY(),
@@ -177,7 +177,7 @@ public class FrameController implements Initializable {
     	}
 	}
 	
-    public void onFrameResize(EnumSet<ResizeDirection> direction, double screenX, double screenY) {
+    public void onWindowResize(EnumSet<ResizeDirection> direction, double screenX, double screenY) {
     	// FIXME: Minimum beim Resize beachten
         if(primaryStage.isResizable() && state == State.RESIZE) {
         	double x = primaryStage.getX();
@@ -203,7 +203,7 @@ public class FrameController implements Initializable {
        	}
     }
 	
-	public void deactivateFrameResize() {
+	public void deactivateWindowResize() {
 		if(state == State.RESIZE) {
 			state = State.NONE;
 		}
@@ -254,21 +254,21 @@ public class FrameController implements Initializable {
     	closeWindow();
     }
     
-    @FXML private void activateFrameDragged(MouseEvent me) {
+    @FXML private void activateWindowDragged(MouseEvent me) {
     	if(me.getButton() == MouseButton.PRIMARY) {
-    		activateFrameDragged(me.getSceneX(), me.getSceneY());
+    		activateWindowDragged(me.getSceneX(), me.getSceneY());
     	}
     }
     
-    @FXML private void onFrameDragged(MouseEvent me) {
+    @FXML private void onWindowDragged(MouseEvent me) {
     	if(me.getButton() == MouseButton.PRIMARY) {
-    		onFrameDragged(me.getScreenX(), me.getScreenY());
+    		onWindowDragged(me.getScreenX(), me.getScreenY());
     	}
     }
     
-    @FXML private void deactivateFrameDragged(MouseEvent me) {
+    @FXML private void deactivateWindowDragged(MouseEvent me) {
     	if(me.getButton() == MouseButton.PRIMARY) {
-    		deactivateFrameDragged();
+    		deactivateWindowDragged();
     	}
     }
     
@@ -298,25 +298,25 @@ public class FrameController implements Initializable {
 		}
 	}
     
-    @FXML private void activateFrameResize(MouseEvent me) {
+    @FXML private void activateWindowResize(MouseEvent me) {
     	if(me.getButton() == MouseButton.PRIMARY) {
     		if(me.getClickCount() == 2) {
-    			onVerticalFrameResize(direction);
+    			onVerticalWindowResize(direction);
     		} else {
-        		activateFrameResize();
+        		activateWindowResize();
     		}
     	}
     }
 
-	@FXML private void onFrameResize(MouseEvent me) {
+	@FXML private void onWindowResize(MouseEvent me) {
     	if(me.getButton() == MouseButton.PRIMARY && !direction.isEmpty()) {
-        	onFrameResize(direction, me.getScreenX(), me.getScreenY());
+        	onWindowResize(direction, me.getScreenX(), me.getScreenY());
     	}
     }
     
-    @FXML private void deactivateFrameResize(MouseEvent me) {
+    @FXML private void deactivateWindowResize(MouseEvent me) {
     	if(me.getButton() == MouseButton.PRIMARY) {
-    		deactivateFrameResize();
+    		deactivateWindowResize();
     	}
     }
 }

@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.Region?>
 <?import de.ruzman.fx.FrameController?>
 
-<Group fx:id="root" onMousePressed="#activateFrameDragged" onMouseDragged="#onFrameDragged"  onMouseReleased="#deactivateFrameDragged"
+<Group fx:id="root" onMousePressed="#activateWindowDragged" onMouseDragged="#onWindowDragged"  onMouseReleased="#deactivateWindowDragged"
 		xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.ruzman.fx.FrameController">
    <children>
    	<BorderPane fx:id="frame">
@@ -28,14 +28,14 @@
    		</top>
    		<center>
    			<AnchorPane fx:id="contentPane" BorderPane.alignment="center">
-   				<Rectangle width="500" height="400" fill="transparent"/>
+   				<Rectangle width="500" height="100" fill="transparent"/>
    			</AnchorPane>
    		</center>
          <effect>
             <DropShadow width="15" height="15"/>
          </effect>
    	</BorderPane>
-   	<Rectangle fx:id="scalePane" onMouseMoved="#setResizeCursor" onMousePressed="#activateFrameResize" 
-   					onMouseDragged="#onFrameResize" onMouseReleased="#deactivateFrameResize" />
+   	<Rectangle fx:id="scalePane" onMouseMoved="#setResizeCursor" onMousePressed="#activateWindowResize" 
+   					onMouseDragged="#onWindowResize" onMouseReleased="#deactivateWindowResize" />
    </children>
 </Group>
