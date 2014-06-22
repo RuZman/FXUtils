@@ -15,6 +15,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -24,6 +25,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+
+import com.sun.istack.internal.NotNull;
 
 public class FrameController implements Initializable {
 	public enum ResizeDirection {
@@ -50,7 +53,7 @@ public class FrameController implements Initializable {
 	@FXML private Rectangle scalePane;
 	
 	@Override
-	public void initialize(URL location, ResourceBundle resources) {		
+	public void initialize(URL location, ResourceBundle resources) {
         root.setTranslateX(HALF_SHADOW_SIZE);
         root.setTranslateY(HALF_SHADOW_SIZE);
 		
@@ -101,6 +104,7 @@ public class FrameController implements Initializable {
 		            			primaryStage.getWidth(), primaryStage.getHeight());
 		            }
 		        	scale(screen.getVisualBounds());
+		            mapFrameToStage();
 		            
 		            root.setTranslateX(0);
 		            root.setTranslateY(0);
@@ -170,12 +174,12 @@ public class FrameController implements Initializable {
 	}
 	
     private void onVerticalWindowResize(EnumSet<ResizeDirection> direction) {
-    	// FIXME: Vertical Resize - SOUTH funktioniert nicht.
     	if(primaryStage.isResizable() && (direction.contains(ResizeDirection.SOUTH) || 
     			direction.contains(ResizeDirection.NORTH))) {
     		if(isDocked) {
     			root.setTranslateY(HALF_SHADOW_SIZE);
                 scale(new Rectangle2D(oldBounds.getMinX(), oldBounds.getMinY(), oldBounds.getWidth(), oldBounds.getHeight()));
+                mapFrameToStage();
                 isDocked = false;
     		} else {
 	            oldBounds = new Rectangle2D(primaryStage.getX(), primaryStage.getY(),
@@ -186,7 +190,9 @@ public class FrameController implements Initializable {
 	        			primaryStage.getY(), primaryStage.getWidth(), primaryStage.getHeight());
 	            Screen screen = screensForRectangle.get(0);
 	            
-	        	scale(new Rectangle2D(primaryStage.getX(), 0, primaryStage.getWidth(), screen.getVisualBounds().getHeight()+SHADOW_SIZE*3/2));
+	        	scale(new Rectangle2D(primaryStage.getX(), 0, primaryStage.getWidth(), screen.getVisualBounds().getHeight()));
+	    		frame.setPrefSize(primaryStage.getWidth()-SHADOW_SIZE, screen.getVisualBounds().getHeight());
+
 	            root.setTranslateY(0);
     		}
     	}
@@ -199,7 +205,7 @@ public class FrameController implements Initializable {
         	double y = primaryStage.getY();
         	double w = primaryStage.getWidth();
         	double h = primaryStage.getHeight();
-        	
+
         	if(isDocked && (direction.contains(ResizeDirection.NORTH) 
         			|| direction.contains(ResizeDirection.SOUTH))) {
         		root.setTranslateY(HALF_SHADOW_SIZE); 
@@ -226,6 +232,7 @@ public class FrameController implements Initializable {
         	}
 
             scale(new Rectangle2D(x, y, w, h));
+            mapFrameToStage();
        	}
     }
 	
@@ -240,8 +247,6 @@ public class FrameController implements Initializable {
         primaryStage.setWidth(bounds.getWidth());
         primaryStage.setX(bounds.getMinX());
         primaryStage.setY(bounds.getMinY());
-        
-        mapFrameToStage();
     }
     
     private void mapFrameToStage() {
