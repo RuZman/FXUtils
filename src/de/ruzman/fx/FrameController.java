@@ -170,8 +170,7 @@ public class FrameController implements Initializable {
 				
 				if(Math.abs(draggedPosition.getY())+Math.abs(y) > screen.getVisualBounds().getHeight()/15) {
 					root.setTranslateY(HALF_SHADOW_SIZE);
-					scale(new Rectangle2D(oldBounds.getMinX(), oldBounds.getMinY(),
-							oldBounds.getWidth(), oldBounds.getHeight()));
+					scale(oldBounds);
 					mapFrameToStage();
 					isDocked = false;
 				}
@@ -216,8 +215,7 @@ public class FrameController implements Initializable {
 						.contains(ResizeDirection.NORTH))) {
 			if (isDocked) {
 				root.setTranslateY(HALF_SHADOW_SIZE);
-				scale(new Rectangle2D(oldBounds.getMinX(), oldBounds.getMinY(),
-						oldBounds.getWidth(), oldBounds.getHeight()));
+				scale(oldBounds);
 				mapFrameToStage();
 				isDocked = false;
 			} else {
@@ -319,8 +317,7 @@ public class FrameController implements Initializable {
 
 	@FXML
 	private void maximizeWindowOnDoubleCLick(MouseEvent me) {
-		if (me.getButton().equals(MouseButton.PRIMARY)
-				&& me.getClickCount() == 2) {
+		if (isPrimaryMouseButton(me) && me.getClickCount() == 2) {
 			// FIXME: Logik in public-Methode verlagern
 			if (isDocked) {
 				root.setTranslateY(HALF_SHADOW_SIZE);
@@ -347,14 +344,14 @@ public class FrameController implements Initializable {
 
 	@FXML
 	private void onWindowDragged(MouseEvent me) {
-		if (me.getButton() == MouseButton.PRIMARY) {
+		if (isPrimaryMouseButton(me)) {
 			onWindowDragged(me.getScreenX(), me.getScreenY());
 		}
 	}
 
 	@FXML
 	private void deactivateWindowDragged(MouseEvent me) {
-		if (me.getButton() == MouseButton.PRIMARY) {
+		if (isPrimaryMouseButton(me)) {
 			deactivateWindowDragged();
 		}
 	}
@@ -389,7 +386,7 @@ public class FrameController implements Initializable {
 
 	@FXML
 	private void activateWindowResize(MouseEvent me) {
-		if (me.getButton() == MouseButton.PRIMARY) {
+		if (isPrimaryMouseButton(me)) {
 			if (me.getClickCount() == 2) {
 				onVerticalWindowResize(direction);
 			} else {
@@ -408,8 +405,12 @@ public class FrameController implements Initializable {
 
 	@FXML
 	private void deactivateWindowResize(MouseEvent me) {
-		if (me.getButton() == MouseButton.PRIMARY) {
+		if (isPrimaryMouseButton(me)) {
 			deactivateWindowResize();
 		}
+	}
+	
+	private boolean isPrimaryMouseButton(MouseEvent me) {
+		return me.getButton() == MouseButton.PRIMARY;
 	}
 }
