@@ -30,13 +30,12 @@ public class FrameController implements Initializable {
 		NORTH, EAST, SOUTH, WEST
 	}
 
-	private EnumSet<ResizeDirection> direction = EnumSet
-			.noneOf(ResizeDirection.class);
-
 	public enum State {
 		NONE, DRAG, RESIZE
 	}
 
+	private EnumSet<ResizeDirection> direction = EnumSet
+			.noneOf(ResizeDirection.class);
 	private State state = State.NONE;
 	protected Rectangle2D oldBounds;
 	protected Point2D draggedPosition;
@@ -105,23 +104,8 @@ public class FrameController implements Initializable {
 							Boolean oldValue, Boolean newValue) {
 						// isMaximized: false -> true
 						if (!oldValue.booleanValue() && newValue.booleanValue()) {
-							ObservableList<Screen> screensForRectangle = Screen
-									.getScreensForRectangle(
-											primaryStage.getX(),
-											primaryStage.getY(),
-											primaryStage.getWidth(),
-											primaryStage.getHeight());
-							Screen screen = screensForRectangle.get(0);
-
-							if (!isDocked) {
-								oldBounds = new Rectangle2D(
-										primaryStage.getX(), primaryStage
-												.getY(), primaryStage
-												.getWidth(), primaryStage
-												.getHeight());
-							}
-							scale(screen.getVisualBounds());
-							mapFrameToStage();
+							saveOldBounds();
+							scale(getVisualBounds());
 
 							root.setTranslateX(0);
 							root.setTranslateY(0);
@@ -140,7 +124,6 @@ public class FrameController implements Initializable {
 							root.getChildren().add(scalePane);
 
 							scale(oldBounds);
-							mapFrameToStage();
 
 							maximize.getStyleClass().add("maximize");
 							maximize.getStyleClass().remove("minimize");
@@ -158,20 +141,13 @@ public class FrameController implements Initializable {
 
 	public void onWindowDragged(double x, double y) {
 		if (state == State.DRAG && !primaryStage.isMaximized()) {
-			// FIXME: Logik ist falsch ... funktioniert bei verschiedenen Dockarten wahrscheinlich nicht.
+			// FIXME: Logik ist falsch ... funktioniert bei verschiedenen
+			// Dockarten wahrscheinlich nicht.
 			if (isDocked) {
-				ObservableList<Screen> screensForRectangle = Screen
-						.getScreensForRectangle(
-								primaryStage.getX(),
-								primaryStage.getY(),
-								primaryStage.getWidth(),
-								primaryStage.getHeight());
-				Screen screen = screensForRectangle.get(0);
-				
-				if(Math.abs(draggedPosition.getY())+Math.abs(y) > screen.getVisualBounds().getHeight()/15) {
+				if (Math.abs(draggedPosition.getY()) + Math.abs(y) > getVisualBounds()
+						.getHeight() / 15) {
 					root.setTranslateY(HALF_SHADOW_SIZE);
 					scale(oldBounds);
-					mapFrameToStage();
 					isDocked = false;
 				}
 			} else {
@@ -198,13 +174,12 @@ public class FrameController implements Initializable {
 	public synchronized void activateWindowResize() {
 		if (state == State.NONE) {
 			state = State.RESIZE;
-			if(isDocked && (direction.contains(ResizeDirection.NORTH) || direction
-					.contains(ResizeDirection.SOUTH))) {
+			if (isDocked
+					&& (direction.contains(ResizeDirection.NORTH) || direction
+							.contains(ResizeDirection.SOUTH))) {
 				// Do nothing
 			} else {
-				oldBounds = new Rectangle2D(primaryStage.getX(),
-						primaryStage.getY(), primaryStage.getWidth(),
-						primaryStage.getHeight());
+				saveOldBounds();
 			}
 		}
 	}
@@ -214,28 +189,14 @@ public class FrameController implements Initializable {
 				&& (direction.contains(ResizeDirection.SOUTH) || direction
 						.contains(ResizeDirection.NORTH))) {
 			if (isDocked) {
+				isDocked = false;
 				root.setTranslateY(HALF_SHADOW_SIZE);
 				scale(oldBounds);
-				mapFrameToStage();
-				isDocked = false;
 			} else {
-				oldBounds = new Rectangle2D(primaryStage.getX(),
-						primaryStage.getY(), primaryStage.getWidth(),
-						primaryStage.getHeight());
-
 				isDocked = true;
-				ObservableList<Screen> screensForRectangle = Screen
-						.getScreensForRectangle(primaryStage.getX(),
-								primaryStage.getY(), primaryStage.getWidth(),
-								primaryStage.getHeight());
-				Screen screen = screensForRectangle.get(0);
-
+				saveOldBounds();
 				scale(new Rectangle2D(primaryStage.getX(), 0,
-						primaryStage.getWidth(), screen.getVisualBounds()
-								.getHeight()));
-				frame.setPrefSize(primaryStage.getWidth() - SHADOW_SIZE, screen
-						.getVisualBounds().getHeight());
-
+						primaryStage.getWidth(), getVisualBounds().getHeight()));
 				root.setTranslateY(0);
 			}
 		}
@@ -279,7 +240,6 @@ public class FrameController implements Initializable {
 			}
 
 			scale(new Rectangle2D(x, y, w, h));
-			mapFrameToStage();
 		}
 	}
 
@@ -289,16 +249,40 @@ public class FrameController implements Initializable {
 		}
 	}
 
-	private void scale(Rectangle2D bounds) {
+	public Rectangle2D getVisualBounds() {
+		ObservableList<Screen> screensForRectangle = Screen
+				.getScreensForRectangle(primaryStage.getX(),
+						primaryStage.getY(), primaryStage.getWidth(),
+						primaryStage.getHeight());
+
+		return screensForRectangle.get(0).getVisualBounds();
+	}
+
+	protected void saveOldBounds() {
+		if (!isDocked) {
+			oldBounds = new Rectangle2D(primaryStage.getX(),
+					primaryStage.getY(), primaryStage.getWidth(),
+					primaryStage.getHeight());
+		} else {
+			// FIXME: Resize im Docking-Mode muss oldBounds überschreiben.
+		}
+	}
+
+	protected void scale(Rectangle2D bounds) {
 		primaryStage.setHeight(bounds.getHeight());
 		primaryStage.setWidth(bounds.getWidth());
 		primaryStage.setX(bounds.getMinX());
 		primaryStage.setY(bounds.getMinY());
+
+		mapFrameToStage();
 	}
 
-	private void mapFrameToStage() {
+	protected void mapFrameToStage() {
 		if (primaryStage.isMaximized()) {
 			frame.setPrefSize(primaryStage.getWidth(), primaryStage.getHeight());
+		} else if (isDocked) {
+			frame.setPrefSize(primaryStage.getWidth() - SHADOW_SIZE,
+					getVisualBounds().getHeight());
 		} else {
 			frame.setPrefSize(primaryStage.getWidth() - HALF_SHADOW_SIZE * 3,
 					primaryStage.getHeight() - HALF_SHADOW_SIZE * 3);
@@ -322,7 +306,6 @@ public class FrameController implements Initializable {
 			if (isDocked) {
 				root.setTranslateY(HALF_SHADOW_SIZE);
 				scale(oldBounds);
-				mapFrameToStage();
 				isDocked = false;
 			} else {
 				primaryStage.setMaximized(!primaryStage.isMaximized());
@@ -409,7 +392,7 @@ public class FrameController implements Initializable {
 			deactivateWindowResize();
 		}
 	}
-	
+
 	private boolean isPrimaryMouseButton(MouseEvent me) {
 		return me.getButton() == MouseButton.PRIMARY;
 	}
