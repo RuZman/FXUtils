@@ -42,9 +42,12 @@ public class FrameController implements Initializable {
 	protected Stage primaryStage;
 	protected boolean isDocked;
 
-	// FIXME: Konstanten Global nutzen (CSS + FXML)
-	public static final int SHADOW_SIZE = 15;
-	public static final int HALF_SHADOW_SIZE = SHADOW_SIZE / 2;
+	private double northShadowWidth;
+	private double eastShadowWidth;
+	private double southShadowWidth;
+	private double westShadowWidth;
+	private double horizontalShadowWidth;
+	private double verticalShadowWidth;
 
 	@FXML private Group root;
 	@FXML private StackPane topBar;
@@ -56,9 +59,14 @@ public class FrameController implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		root.setTranslateX(HALF_SHADOW_SIZE);
-		root.setTranslateY(HALF_SHADOW_SIZE);
-
+		// FIXME: No magic values
+		northShadowWidth = 7.5;
+		eastShadowWidth = 7.5;
+		southShadowWidth = 7.5;
+		westShadowWidth = 7.5;
+		horizontalShadowWidth = eastShadowWidth + westShadowWidth;
+		verticalShadowWidth = northShadowWidth + southShadowWidth;
+		
 		topBar.prefWidthProperty().bind(frame.widthProperty());
 		scalePane.widthProperty().bind(frame.widthProperty());
 		scalePane.heightProperty().bind(frame.heightProperty());
@@ -72,6 +80,7 @@ public class FrameController implements Initializable {
 		}
 		addResizableChangeListener();
 		addMaximizedChangeListener();
+		restoreTranslation();
 	}
 
 	private void addResizableChangeListener() {
@@ -119,8 +128,7 @@ public class FrameController implements Initializable {
 						} else if (oldValue.booleanValue()
 								&& !newValue.booleanValue()) {
 
-							root.setTranslateX(HALF_SHADOW_SIZE);
-							root.setTranslateY(HALF_SHADOW_SIZE);
+							restoreTranslation();
 							root.getChildren().add(scalePane);
 
 							scale(oldBounds);
@@ -144,11 +152,10 @@ public class FrameController implements Initializable {
 			// FIXME: Logik ist falsch ... funktioniert bei verschiedenen
 			// Dockarten wahrscheinlich nicht.
 			if (isDocked) {
-				if (Math.abs(draggedPosition.getY()) + Math.abs(y) > getVisualBounds()
-						.getHeight() / 15) {
-					root.setTranslateY(HALF_SHADOW_SIZE);
-					scale(oldBounds);
+				if (!isDockingIntoTop(y)) {
 					isDocked = false;
+					restoreTranslation();
+					scale(oldBounds);
 				}
 			} else {
 				root.getScene().getWindow().setY(y - draggedPosition.getY());
@@ -190,7 +197,7 @@ public class FrameController implements Initializable {
 						.contains(ResizeDirection.NORTH))) {
 			if (isDocked) {
 				isDocked = false;
-				root.setTranslateY(HALF_SHADOW_SIZE);
+				restoreTranslation();
 				scale(oldBounds);
 			} else {
 				isDocked = true;
@@ -214,7 +221,7 @@ public class FrameController implements Initializable {
 			if (isDocked
 					&& (direction.contains(ResizeDirection.NORTH) || direction
 							.contains(ResizeDirection.SOUTH))) {
-				root.setTranslateY(HALF_SHADOW_SIZE);
+				restoreTranslation();
 
 				x = oldBounds.getMinX();
 				y = oldBounds.getMinY();
@@ -224,19 +231,19 @@ public class FrameController implements Initializable {
 			}
 
 			if (direction.contains(ResizeDirection.WEST)) {
-				x = screenX - HALF_SHADOW_SIZE;
-				w = oldBounds.getWidth() + HALF_SHADOW_SIZE
+				x = screenX - eastShadowWidth;
+				w = oldBounds.getWidth() + eastShadowWidth
 						+ oldBounds.getMinX() - screenX;
 			} else if (direction.contains(ResizeDirection.EAST)) {
-				w = screenX - primaryStage.getX() + SHADOW_SIZE;
+				w = screenX - primaryStage.getX() + horizontalShadowWidth;
 			}
 
 			if (direction.contains(ResizeDirection.NORTH)) {
-				y = screenY - HALF_SHADOW_SIZE;
-				h = oldBounds.getHeight() + HALF_SHADOW_SIZE
+				y = screenY - northShadowWidth;
+				h = oldBounds.getHeight() + northShadowWidth
 						+ oldBounds.getMinY() - screenY;
 			} else if (direction.contains(ResizeDirection.SOUTH)) {
-				h = screenY - primaryStage.getY() + SHADOW_SIZE;
+				h = screenY - primaryStage.getY() + verticalShadowWidth;
 			}
 
 			scale(new Rectangle2D(x, y, w, h));
@@ -281,12 +288,24 @@ public class FrameController implements Initializable {
 		if (primaryStage.isMaximized()) {
 			frame.setPrefSize(primaryStage.getWidth(), primaryStage.getHeight());
 		} else if (isDocked) {
-			frame.setPrefSize(primaryStage.getWidth() - SHADOW_SIZE,
+			frame.setPrefSize(primaryStage.getWidth() - horizontalShadowWidth,
 					getVisualBounds().getHeight());
 		} else {
-			frame.setPrefSize(primaryStage.getWidth() - HALF_SHADOW_SIZE * 3,
-					primaryStage.getHeight() - HALF_SHADOW_SIZE * 3);
+			// FIXME: ???
+			frame.setPrefSize(primaryStage.getWidth() - northShadowWidth * 3,
+					primaryStage.getHeight() - northShadowWidth * 3);
 		}
+	}
+	
+	protected void restoreTranslation() {
+		root.setTranslateX(westShadowWidth);
+		root.setTranslateY(northShadowWidth);
+		mapFrameToStage();
+	}
+	
+	private boolean isDockingIntoTop(double y) {
+		return Math.abs(draggedPosition.getY()) + Math.abs(y) < getVisualBounds()
+				.getHeight() / 15;
 	}
 
 	@FXML
@@ -304,9 +323,9 @@ public class FrameController implements Initializable {
 		if (isPrimaryMouseButton(me) && me.getClickCount() == 2) {
 			// FIXME: Logik in public-Methode verlagern
 			if (isDocked) {
-				root.setTranslateY(HALF_SHADOW_SIZE);
-				scale(oldBounds);
 				isDocked = false;
+				restoreTranslation();
+				scale(oldBounds);
 			} else {
 				primaryStage.setMaximized(!primaryStage.isMaximized());
 			}
@@ -342,7 +361,8 @@ public class FrameController implements Initializable {
 	@FXML
 	private void setResizeCursor(MouseEvent me) {
 		StringBuilder cursorName = new StringBuilder(9);
-		double resizeArea = SHADOW_SIZE + scalePane.getStrokeWidth();
+		// FIXME: Worng Value: double resizeArea = SHADOW_SIZE + scalePane.getStrokeWidth();
+		double resizeArea = horizontalShadowWidth + scalePane.getStrokeWidth();
 		direction.clear();
 
 		if (me.getSceneY() < resizeArea) {
