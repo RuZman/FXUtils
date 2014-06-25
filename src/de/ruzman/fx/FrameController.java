@@ -105,6 +105,7 @@ public class FrameController implements Initializable {
 	}
 
 	private void addMaximizedChangeListener() {
+		// FIXME: Minimize funktioniert nicht
 		primaryStage.maximizedProperty().addListener(
 				new ChangeListener<Boolean>() {
 					@Override
@@ -113,7 +114,10 @@ public class FrameController implements Initializable {
 							Boolean oldValue, Boolean newValue) {
 						// isMaximized: false -> true
 						if (!oldValue.booleanValue() && newValue.booleanValue()) {
-							saveOldBounds();
+							if(state != State.DRAG) {
+								saveOldBounds();
+							}
+							
 							scale(getVisualBounds());
 
 							root.setTranslateX(0);
@@ -144,6 +148,7 @@ public class FrameController implements Initializable {
 		if (state == State.NONE) {
 			state = State.DRAG;
 			draggedPosition = new Point2D(x, y);
+			saveOldBounds();
 		}
 	}
 
@@ -164,8 +169,15 @@ public class FrameController implements Initializable {
 		}
 	}
 
-	public void deactivateWindowDragged() {
+	public void deactivateWindowDragged(double x, double y) {
 		if (state == State.DRAG) {
+			if(y < getVisualBounds().getHeight() / 15) {
+				primaryStage.setMaximized(true);
+			} else if(x < getVisualBounds().getWidth() / 15) {
+				// FIXME: Dock left
+			} else if(x > getVisualBounds().getWidth()-getVisualBounds().getWidth() / 15) {
+				// FIXME: Dock right
+			}
 			state = State.NONE;
 		}
 	}
@@ -304,6 +316,8 @@ public class FrameController implements Initializable {
 	}
 	
 	private boolean isDockingIntoTop(double y) {
+		// FIXME: Falsch: Seitenwechsel von Top > Out und Out > Top wird nicht berücksichtigt.
+		// FIXME: Funktioniert nicht, wenn in der Mitte der Frames gedraggt wird.
 		return Math.abs(draggedPosition.getY()) + Math.abs(y) < getVisualBounds()
 				.getHeight() / 15;
 	}
@@ -354,7 +368,7 @@ public class FrameController implements Initializable {
 	@FXML
 	private void deactivateWindowDragged(MouseEvent me) {
 		if (isPrimaryMouseButton(me)) {
-			deactivateWindowDragged();
+			deactivateWindowDragged(me.getScreenX(), me.getScreenY());
 		}
 	}
 
