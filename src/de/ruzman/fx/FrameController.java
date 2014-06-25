@@ -320,7 +320,7 @@ public class FrameController implements Initializable {
 
 	@FXML
 	private void activateWindowDragged(MouseEvent me) {
-		if (me.getButton() == MouseButton.PRIMARY) {
+		if (isPrimaryMouseButton(me)) {
 			activateWindowDragged(me.getSceneX(), me.getSceneY());
 		}
 	}
@@ -381,7 +381,7 @@ public class FrameController implements Initializable {
 
 	@FXML
 	private void onWindowResize(MouseEvent me) {
-		if (me.getButton() == MouseButton.PRIMARY && !direction.isEmpty()) {
+		if (isPrimaryMouseButton(me) && !direction.isEmpty()) {
 			onWindowResize(direction, me.getScreenX(), me.getScreenY());
 		}
 	}
