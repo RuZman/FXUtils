@@ -52,13 +52,7 @@ public class FrameController implements Initializable {
 	protected BooleanProperty maximized = new SimpleBooleanProperty(false);
 	protected BooleanProperty iconified = new SimpleBooleanProperty(false);
 
-	private double northShadowWidth;
-	private double eastShadowWidth;
-	private double southShadowWidth;
-	private double westShadowWidth;
-	private double horizontalShadowWidth;
-	private double verticalShadowWidth;
-
+	@FXML private WindowShadowBorder windowShadowBorder;
 	@FXML private Group root;
 	@FXML private StackPane topBar;
 	@FXML private BorderPane frame;
@@ -68,21 +62,14 @@ public class FrameController implements Initializable {
 	@FXML private Rectangle scalePane;
 
 	@Override
-	public void initialize(URL location, ResourceBundle resources) {
-		// FIXME: No magic values
-		northShadowWidth = 7.5;
-		eastShadowWidth = 7.5;
-		southShadowWidth = 7.5;
-		westShadowWidth = 7.5;
-		horizontalShadowWidth = eastShadowWidth + westShadowWidth;
-		verticalShadowWidth = northShadowWidth + southShadowWidth;
-		
+	public void initialize(URL location, ResourceBundle resources) {		
 		topBar.prefWidthProperty().bind(frame.widthProperty());
 		scalePane.widthProperty().bind(frame.widthProperty());
 		scalePane.heightProperty().bind(frame.heightProperty());
 
 		addResizableChangeListener();
 		addMaximizedChangeListener();
+		
 		restoreTranslation();
 	}
 
@@ -237,19 +224,19 @@ public class FrameController implements Initializable {
 			}
 
 			if (direction.contains(ResizeDirection.WEST)) {
-				px = screenX - eastShadowWidth;
-				w = oldBounds.getWidth() + eastShadowWidth
+				px = screenX - windowShadowBorder.getEastWidth();
+				w = oldBounds.getWidth() + windowShadowBorder.getEastWidth()
 						+ oldBounds.getMinX() - screenX;
 			} else if (direction.contains(ResizeDirection.EAST)) {
-				w = screenX - x.getValue() + horizontalShadowWidth;
+				w = screenX - x.getValue() + windowShadowBorder.getHorizonalWidth();
 			}
 
 			if (direction.contains(ResizeDirection.NORTH)) {
-				py = screenY - northShadowWidth;
-				h = oldBounds.getHeight() + northShadowWidth
+				py = screenY - windowShadowBorder.getNorthWidth();
+				h = oldBounds.getHeight() + windowShadowBorder.getNorthWidth()
 						+ oldBounds.getMinY() - screenY;
 			} else if (direction.contains(ResizeDirection.SOUTH)) {
-				h = screenY - y.getValue() + verticalShadowWidth;
+				h = screenY - y.getValue() + windowShadowBorder.getVerticalWidth();
 			}
 
 			scale(new Rectangle2D(px, py, w, h));
@@ -295,18 +282,18 @@ public class FrameController implements Initializable {
 		if (maximized.getValue()) {
 			frame.setPrefSize(width.getValue(), height.getValue());
 		} else if (isDocked) {
-			frame.setPrefSize(width.getValue() - horizontalShadowWidth,
+			frame.setPrefSize(width.getValue() - windowShadowBorder.getHorizonalWidth(),
 					getVisualBounds().getHeight());
 		} else {
 			// FIXME: ???
-			frame.setPrefSize(width.getValue() - northShadowWidth * 3,
-					height.getValue() - northShadowWidth * 3);
+			frame.setPrefSize(width.getValue() - windowShadowBorder.getNorthWidth() * 3,
+					height.getValue() - windowShadowBorder.getNorthWidth() * 3);
 		}
 	}
 	
 	protected void restoreTranslation() {
-		root.setTranslateX(westShadowWidth);
-		root.setTranslateY(northShadowWidth);
+		root.setTranslateX(windowShadowBorder.getWestWidth());
+		root.setTranslateY(windowShadowBorder.getNorthWidth());
 		mapFrameToStage();
 	}
 	
@@ -372,7 +359,7 @@ public class FrameController implements Initializable {
 	private void setResizeCursor(MouseEvent me) {
 		StringBuilder cursorName = new StringBuilder(9);
 		// FIXME: Worng Value: double resizeArea = SHADOW_SIZE + scalePane.getStrokeWidth();
-		double resizeArea = horizontalShadowWidth + scalePane.getStrokeWidth();
+		double resizeArea = windowShadowBorder.getHorizonalWidth() + scalePane.getStrokeWidth();
 		direction.clear();
 
 		if (me.getSceneY() < resizeArea) {
