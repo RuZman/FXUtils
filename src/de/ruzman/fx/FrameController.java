@@ -62,76 +62,75 @@ public class FrameController implements Initializable {
 	@FXML private Rectangle scalePane;
 
 	@Override
-	public void initialize(URL location, ResourceBundle resources) {		
+	public void initialize(URL location, ResourceBundle resources) {
+		if (windowShadowBorder == null) {
+			// FIXME: Skalierung funktioniert bei Programmstart nicht.
+			windowShadowBorder = new WindowShadowBorder();
+		}
+
 		topBar.prefWidthProperty().bind(frame.widthProperty());
 		scalePane.widthProperty().bind(frame.widthProperty());
 		scalePane.heightProperty().bind(frame.heightProperty());
 
 		addResizableChangeListener();
 		addMaximizedChangeListener();
-		
+
 		restoreTranslation();
 	}
 
 	private void addResizableChangeListener() {
-		resizable.addListener(
-				new ChangeListener<Boolean>() {
-					@Override
-					public void changed(
-							ObservableValue<? extends Boolean> observable,
-							Boolean oldValue, Boolean newValue) {
-						// isResizable: false -> true
-						if (!oldValue.booleanValue() && newValue.booleanValue()) {
-							frameControl.getChildren().add(
-									frameControl.getChildren().indexOf(close),
+		resizable.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable,
+					Boolean oldValue, Boolean newValue) {
+				// isResizable: false -> true
+				if (!oldValue.booleanValue() && newValue.booleanValue()) {
+					frameControl.getChildren()
+							.add(frameControl.getChildren().indexOf(close),
 									maximize);
-							// isResizable: true -> false
-						} else if (oldValue.booleanValue()
-								&& !newValue.booleanValue()) {
-							frameControl.getChildren().remove(maximize);
-						}
-					}
-				});
+					// isResizable: true -> false
+				} else if (oldValue.booleanValue() && !newValue.booleanValue()) {
+					frameControl.getChildren().remove(maximize);
+				}
+			}
+		});
 	}
 
 	private void addMaximizedChangeListener() {
 		// FIXME: Minimize funktioniert nicht
-		maximized.addListener(
-				new ChangeListener<Boolean>() {
-					@Override
-					public void changed(
-							ObservableValue<? extends Boolean> observable,
-							Boolean oldValue, Boolean newValue) {
-						// isMaximized: false -> true
-						if (!oldValue.booleanValue() && newValue.booleanValue()) {
-							if(state != State.DRAG) {
-								saveOldBounds();
-							}
-							
-							scale(getVisualBounds());
-
-							root.setTranslateX(0);
-							root.setTranslateY(0);
-							root.getChildren().remove(scalePane);
-
-							maximize.getStyleClass().remove("maximize");
-							maximize.getStyleClass().add("minimize");
-
-							isDocked = false;
-							// isMaximized: true -> false
-						} else if (oldValue.booleanValue()
-								&& !newValue.booleanValue()) {
-
-							restoreTranslation();
-							root.getChildren().add(scalePane);
-
-							scale(oldBounds);
-
-							maximize.getStyleClass().add("maximize");
-							maximize.getStyleClass().remove("minimize");
-						}
+		maximized.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable,
+					Boolean oldValue, Boolean newValue) {
+				// isMaximized: false -> true
+				if (!oldValue.booleanValue() && newValue.booleanValue()) {
+					if (state != State.DRAG) {
+						saveOldBounds();
 					}
-				});
+
+					scale(getVisualBounds());
+
+					root.setTranslateX(0);
+					root.setTranslateY(0);
+					root.getChildren().remove(scalePane);
+
+					maximize.getStyleClass().remove("maximize");
+					maximize.getStyleClass().add("minimize");
+
+					isDocked = false;
+					// isMaximized: true -> false
+				} else if (oldValue.booleanValue() && !newValue.booleanValue()) {
+
+					restoreTranslation();
+					root.getChildren().add(scalePane);
+
+					scale(oldBounds);
+
+					maximize.getStyleClass().add("maximize");
+					maximize.getStyleClass().remove("minimize");
+				}
+			}
+		});
 	}
 
 	public synchronized void activateWindowDragged(double x, double y) {
@@ -161,12 +160,21 @@ public class FrameController implements Initializable {
 
 	public void deactivateWindowDragged(double x, double y) {
 		if (state == State.DRAG) {
-			if(y < getVisualBounds().getHeight() / 15) {
+			if (y < getVisualBounds().getHeight() / 15) {
 				maximized.setValue(true);
-			} else if(x < getVisualBounds().getWidth() / 15) {
-				// FIXME: Dock left
-			} else if(x > getVisualBounds().getWidth()-getVisualBounds().getWidth() / 15) {
-				// FIXME: Dock right
+			} else if (x < getVisualBounds().getWidth() / 15) {
+				isDocked = true;
+				root.setTranslateX(0);
+				root.setTranslateY(0);
+				scale(new Rectangle2D(0, 0, getVisualBounds().getWidth() / 2,
+						getVisualBounds().getHeight()));
+			} else if (x > getVisualBounds().getWidth()
+					- getVisualBounds().getWidth() / 15) {
+				isDocked = true;
+				root.setTranslateY(0);
+				scale(new Rectangle2D(getVisualBounds().getWidth() / 2 + windowShadowBorder.getEastWidth(), 0,
+						getVisualBounds().getWidth() / 2, getVisualBounds()
+								.getHeight()));
 			}
 			state = State.NONE;
 		}
@@ -196,7 +204,8 @@ public class FrameController implements Initializable {
 			} else {
 				isDocked = true;
 				saveOldBounds();
-				scale(new Rectangle2D(x.getValue(), 0, width.getValue(), getVisualBounds().getHeight()));
+				scale(new Rectangle2D(x.getValue(), 0, width.getValue(),
+						getVisualBounds().getHeight()));
 				root.setTranslateY(0);
 			}
 		}
@@ -228,7 +237,8 @@ public class FrameController implements Initializable {
 				w = oldBounds.getWidth() + windowShadowBorder.getEastWidth()
 						+ oldBounds.getMinX() - screenX;
 			} else if (direction.contains(ResizeDirection.EAST)) {
-				w = screenX - x.getValue() + windowShadowBorder.getHorizonalWidth();
+				w = screenX - x.getValue()
+						+ windowShadowBorder.getHorizonalWidth();
 			}
 
 			if (direction.contains(ResizeDirection.NORTH)) {
@@ -236,7 +246,8 @@ public class FrameController implements Initializable {
 				h = oldBounds.getHeight() + windowShadowBorder.getNorthWidth()
 						+ oldBounds.getMinY() - screenY;
 			} else if (direction.contains(ResizeDirection.SOUTH)) {
-				h = screenY - y.getValue() + windowShadowBorder.getVerticalWidth();
+				h = screenY - y.getValue()
+						+ windowShadowBorder.getVerticalWidth();
 			}
 
 			scale(new Rectangle2D(px, py, w, h));
@@ -248,22 +259,27 @@ public class FrameController implements Initializable {
 			state = State.NONE;
 		}
 	}
-	
+
 	public void closeWindow() {
-		root.getScene().getWindow().fireEvent(new WindowEvent(
-				root.getScene().getWindow(), WindowEvent.WINDOW_CLOSE_REQUEST));
+		root.getScene()
+				.getWindow()
+				.fireEvent(
+						new WindowEvent(root.getScene().getWindow(),
+								WindowEvent.WINDOW_CLOSE_REQUEST));
 	}
 
 	public Rectangle2D getVisualBounds() {
 		ObservableList<Screen> screensForRectangle = Screen
-				.getScreensForRectangle(x.getValue(), y.getValue(), width.getValue(), height.getValue());
+				.getScreensForRectangle(x.getValue(), y.getValue(),
+						width.getValue(), height.getValue());
 
 		return screensForRectangle.get(0).getVisualBounds();
 	}
 
 	protected void saveOldBounds() {
 		if (!isDocked) {
-			oldBounds = new Rectangle2D(x.getValue(), y.getValue(), width.getValue(), height.getValue());
+			oldBounds = new Rectangle2D(x.getValue(), y.getValue(),
+					width.getValue(), height.getValue());
 		} else {
 			// FIXME: Resize im Docking-Mode muss oldBounds ?berschreiben.
 		}
@@ -282,23 +298,25 @@ public class FrameController implements Initializable {
 		if (maximized.getValue()) {
 			frame.setPrefSize(width.getValue(), height.getValue());
 		} else if (isDocked) {
-			frame.setPrefSize(width.getValue() - windowShadowBorder.getHorizonalWidth(),
+			frame.setPrefSize(
+					width.getValue() - windowShadowBorder.getHorizonalWidth(),
 					getVisualBounds().getHeight());
 		} else {
 			// FIXME: ???
-			frame.setPrefSize(width.getValue() - windowShadowBorder.getNorthWidth() * 3,
+			frame.setPrefSize(
+					width.getValue() - windowShadowBorder.getNorthWidth() * 3,
 					height.getValue() - windowShadowBorder.getNorthWidth() * 3);
 		}
 	}
-	
+
 	protected void restoreTranslation() {
 		root.setTranslateX(windowShadowBorder.getWestWidth());
 		root.setTranslateY(windowShadowBorder.getNorthWidth());
 		mapFrameToStage();
 	}
-	
+
 	private boolean isDockingIntoTop(double y) {
-		// FIXME: Falsch: Seitenwechsel von Top > Out und Out > Top wird nicht ber?cksichtigt.
+		// FIXME: Falsch: Seitenwechsel von Top > Out und Out > Top wird nicht berücksichtigt.
 		// FIXME: Funktioniert nicht, wenn in der Mitte der Frames gedraggt wird.
 		return Math.abs(draggedPosition.getY()) + Math.abs(y) < getVisualBounds()
 				.getHeight() / 15;
@@ -306,7 +324,6 @@ public class FrameController implements Initializable {
 
 	@FXML
 	private void iconifyWindow(ActionEvent event) {
-		// FIXME: Iconified Applikation mit einem Klick in der Leiste wieder aufpoppen.
 		iconified.setValue(true);
 	}
 
@@ -358,8 +375,10 @@ public class FrameController implements Initializable {
 	@FXML
 	private void setResizeCursor(MouseEvent me) {
 		StringBuilder cursorName = new StringBuilder(9);
-		// FIXME: Worng Value: double resizeArea = SHADOW_SIZE + scalePane.getStrokeWidth();
-		double resizeArea = windowShadowBorder.getHorizonalWidth() + scalePane.getStrokeWidth();
+		// FIXME: Worng Value: double resizeArea = SHADOW_SIZE +
+		// scalePane.getStrokeWidth();
+		double resizeArea = windowShadowBorder.getHorizonalWidth()
+				+ scalePane.getStrokeWidth();
 		direction.clear();
 
 		if (me.getSceneY() < resizeArea) {
@@ -377,7 +396,7 @@ public class FrameController implements Initializable {
 			cursorName.append('E');
 			direction.add(ResizeDirection.EAST);
 		}
-		
+
 		if (resizable.getValue() && cursorName.length() != 0) {
 			scalePane.setCursor(Cursor.cursor(cursorName.append("_RESIZE")
 					.toString()));

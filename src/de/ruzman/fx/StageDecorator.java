@@ -30,6 +30,7 @@ public class StageDecorator {
 			controller.width.setValue(stage.getWidth());
 			controller.height.setValue(stage.getHeight());
 			controller.resizable.setValue(stage.isResizable());
+			controller.iconified.setValue(stage.isIconified());
 			
 			// FIXME: Replace ....
 			stage.maximizedProperty().addListener(new ChangeListener<Boolean>() {
@@ -52,6 +53,7 @@ public class StageDecorator {
 				@Override
 				public void changed(ObservableValue<? extends Boolean> observable,
 						Boolean oldValue, Boolean newValue) {
+					// FIXME: Klick in der Windowsliste, hat keine Auswirkung?!
 					controller.iconified.setValue(newValue);
 				}
 			});
