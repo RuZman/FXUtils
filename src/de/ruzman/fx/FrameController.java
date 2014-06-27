@@ -20,6 +20,7 @@ import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -54,7 +55,7 @@ public class FrameController implements Initializable {
 	protected BooleanProperty maximized = new SimpleBooleanProperty(false);
 	protected BooleanProperty iconified = new SimpleBooleanProperty(false);
 	@FXML protected StringProperty title = new SimpleStringProperty(null, "title");
-
+	
 	@FXML private WindowShadowBorder windowShadowBorder;
 	@FXML private Group root;
 	@FXML private StackPane topBar;
@@ -74,29 +75,10 @@ public class FrameController implements Initializable {
 		scalePane.widthProperty().bind(frame.widthProperty());
 		scalePane.heightProperty().bind(frame.heightProperty());
 
-		addResizableChangeListener();
+		maximize.managedProperty().bind(resizable);
 		addMaximizedChangeListener();
 
 		restoreTranslation();
-		maximize.setManaged(false);
-	}
-
-	private void addResizableChangeListener() {
-		resizable.addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable,
-					Boolean oldValue, Boolean newValue) {
-				// isResizable: false -> true
-				if (!oldValue.booleanValue() && newValue.booleanValue()) {
-					frameControl.getChildren().add(frameControl.getChildren().indexOf(close), maximize);
-					root.getChildren().add(scalePane);
-					// isResizable: true -> false
-				} else if (oldValue.booleanValue() && !newValue.booleanValue()) {
-					frameControl.getChildren().remove(maximize);
-					root.getChildren().remove(scalePane);
-				}
-			}
-		});
 	}
 
 	private void addMaximizedChangeListener() {
@@ -186,9 +168,7 @@ public class FrameController implements Initializable {
 	public synchronized void activateWindowResize() {
 		if (state == State.NONE) {
 			state = State.RESIZE;
-			if (isDocked
-					&& (direction.contains(ResizeDirection.NORTH) || direction
-							.contains(ResizeDirection.SOUTH))) {
+			if (isDocked && isVerticalResizeDirection()) {
 				// Do nothing
 			} else {
 				saveOldBounds();
@@ -223,9 +203,7 @@ public class FrameController implements Initializable {
 			double w = width.getValue();
 			double h = height.getValue();
 
-			if (isDocked
-					&& (direction.contains(ResizeDirection.NORTH) || direction
-							.contains(ResizeDirection.SOUTH))) {
+			if (isDocked && isVerticalResizeDirection()) {
 				restoreTranslation();
 
 				px = oldBounds.getMinX();
@@ -323,7 +301,11 @@ public class FrameController implements Initializable {
 		// FIXME: Funktioniert nicht, wenn in der Mitte der Frames gedraggt wird.
 		return Math.abs(draggedPosition.getY()) + Math.abs(y) < getVisualBounds()
 				.getHeight() / 15;
-	}	
+	}
+	
+	private boolean isVerticalResizeDirection() {
+		return direction.contains(ResizeDirection.NORTH) || direction.contains(ResizeDirection.SOUTH);
+	}
 
 	@FXML
 	private void iconifyWindow(ActionEvent event) {
@@ -431,7 +413,7 @@ public class FrameController implements Initializable {
 			deactivateWindowResize();
 		}
 	}
-
+	
 	private boolean isPrimaryMouseButton(MouseEvent me) {
 		return me.getButton() == MouseButton.PRIMARY;
 	}

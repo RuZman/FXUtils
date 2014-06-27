@@ -13,9 +13,9 @@ public class Main extends Application {
 		primaryStage.setY(100);
 		primaryStage.setWidth(700);
 		primaryStage.setHeight(200);
-		primaryStage.setResizable(false);
+		primaryStage.setResizable(true);
 		primaryStage.setMaximized(false);
-		primaryStage.setIconified(true);
+		primaryStage.setIconified(false);
 		primaryStage.setTitle("ModernFX");
         primaryStage.show();
 	}

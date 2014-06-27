@@ -19,13 +19,13 @@ public class StageDecorator {
 	        scene.setFill(null); 
 	        
 	        FrameController controller = loader.getController();
-			controller.x.setValue(stage.getX());
-			controller.y.setValue(stage.getY());
-			controller.width.setValue(stage.getWidth());
-			controller.height.setValue(stage.getHeight());
-			controller.resizable.setValue(stage.isResizable());
-			controller.iconified.setValue(stage.isIconified());
-			controller.title.setValue(stage.getTitle());
+	        controller.xProperty().setValue(stage.getX());
+	        controller.yProperty().setValue(stage.getY());
+	        controller.widthProperty().setValue(stage.getWidth());
+	        controller.heightProperty().setValue(stage.getHeight());
+	        controller.resizableProperty().setValue(stage.isResizable());
+	        controller.iconifiedProperty().setValue(stage.isIconified());
+			controller.titleProperty().setValue(stage.getTitle());
 			
 			// FIXME: Replace ....
 			stage.maximizedProperty().addListener(new ChangeListener<Boolean>() {
@@ -128,6 +128,7 @@ public class StageDecorator {
 						ObservableValue<? extends Number> observable,
 						Number oldValue, Number newValue) {
 					stage.setWidth(newValue.doubleValue());
+					controller.mapFrameToStage();
 				}
 			});
 			stage.heightProperty().addListener(new ChangeListener<Number>() {
@@ -145,6 +146,7 @@ public class StageDecorator {
 						ObservableValue<? extends Number> observable,
 						Number oldValue, Number newValue) {
 					stage.setHeight(newValue.doubleValue());
+					controller.mapFrameToStage();
 				}
 			});
 			stage.titleProperty().addListener(new ChangeListener<String>() {
