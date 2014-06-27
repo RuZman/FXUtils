@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.Region?>
 <?import de.ruzman.fx.FrameController?>
 <?import de.ruzman.fx.WindowShadowBorder?>
-
+<?import javafx.scene.control.Label?>
 
 <Group fx:id="root" onMousePressed="#activateWindowDragged" onMouseDragged="#onWindowDragged"  onMouseReleased="#deactivateWindowDragged"
 		xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.ruzman.fx.FrameController">
@@ -23,7 +23,8 @@
    	<BorderPane fx:id="frame">
    		<top>
    			<StackPane fx:id="topBar" onMouseClicked="#maximizeWindowOnDoubleCLick">
-      			<HBox fx:id="frameControl" StackPane.alignment="TOP_RIGHT"> 
+      			<HBox fx:id="frameControl" StackPane.alignment="TOP_RIGHT">
+      				<Label fx:id="titleText" text="${controller.title}"/>
       				<Region HBox.hgrow="ALWAYS" />
          			<Button fx:id="iconify" prefHeight="25" prefWidth="30" onAction="#iconifyWindow" />
          			<Button fx:id="maximize" prefHeight="25" prefWidth="30" styleClass="maximize" onAction="#maximizeWindow" />

@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 public class StageDecorator {
-	public void decorate(Stage stage) {
+	public FrameController decorate(Stage stage) {
 		try {
 			stage.initStyle(StageStyle.TRANSPARENT);
 			
@@ -17,20 +17,15 @@ public class StageDecorator {
 			Scene scene = new Scene(loader.getRoot());
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 	        scene.setFill(null); 
-
-	       FrameController controller = loader.getController();
 	        
-			
-			if (!stage.isResizable()) {
-				// FIXME: frameControl.getChildren().remove(maximize);
-			}
-
+	        FrameController controller = loader.getController();
 			controller.x.setValue(stage.getX());
 			controller.y.setValue(stage.getY());
 			controller.width.setValue(stage.getWidth());
 			controller.height.setValue(stage.getHeight());
 			controller.resizable.setValue(stage.isResizable());
 			controller.iconified.setValue(stage.isIconified());
+			controller.title.setValue(stage.getTitle());
 			
 			// FIXME: Replace ....
 			stage.maximizedProperty().addListener(new ChangeListener<Boolean>() {
@@ -152,13 +147,33 @@ public class StageDecorator {
 					stage.setHeight(newValue.doubleValue());
 				}
 			});
-
+			stage.titleProperty().addListener(new ChangeListener<String>() {
+				@Override
+				public void changed(
+						ObservableValue<? extends String> observable,
+						String oldValue, String newValue) {
+					controller.title.setValue(newValue);
+				}
+				
+			});
+			controller.title.addListener(new ChangeListener<String>() {
+				@Override
+				public void changed(
+						ObservableValue<? extends String> observable,
+						String oldValue, String newValue) {
+					stage.setTitle(newValue);
+				}
+			});
+			
 	        // FIXME: Scene == ContentPane
 	        stage.setScene(scene);
 
-	        
+
+			return controller;
 		} catch(Exception e) { 
 			e.printStackTrace();
 		}
+
+		return null;
 	}
 }

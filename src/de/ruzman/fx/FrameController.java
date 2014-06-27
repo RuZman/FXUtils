@@ -8,6 +8,8 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -44,13 +46,14 @@ public class FrameController implements Initializable {
 	protected Point2D draggedPosition;
 	protected boolean isDocked;
 
-	protected DoubleProperty x = new SimpleDoubleProperty(0.0);
-	protected DoubleProperty y = new SimpleDoubleProperty(0.0);
-	protected DoubleProperty width = new SimpleDoubleProperty(0.0);
-	protected DoubleProperty height = new SimpleDoubleProperty(0.0);
+	protected DoubleProperty x = new SimpleDoubleProperty(0);
+	protected DoubleProperty y = new SimpleDoubleProperty(0);
+	protected DoubleProperty width = new SimpleDoubleProperty(0);
+	protected DoubleProperty height = new SimpleDoubleProperty(0);
 	protected BooleanProperty resizable = new SimpleBooleanProperty(true);
 	protected BooleanProperty maximized = new SimpleBooleanProperty(false);
 	protected BooleanProperty iconified = new SimpleBooleanProperty(false);
+	@FXML protected StringProperty title = new SimpleStringProperty(null, "title");
 
 	@FXML private WindowShadowBorder windowShadowBorder;
 	@FXML private Group root;
@@ -64,7 +67,6 @@ public class FrameController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		if (windowShadowBorder == null) {
-			// FIXME: Skalierung funktioniert bei Programmstart nicht.
 			windowShadowBorder = new WindowShadowBorder();
 		}
 
@@ -76,6 +78,7 @@ public class FrameController implements Initializable {
 		addMaximizedChangeListener();
 
 		restoreTranslation();
+		maximize.setManaged(false);
 	}
 
 	private void addResizableChangeListener() {
@@ -85,12 +88,12 @@ public class FrameController implements Initializable {
 					Boolean oldValue, Boolean newValue) {
 				// isResizable: false -> true
 				if (!oldValue.booleanValue() && newValue.booleanValue()) {
-					frameControl.getChildren()
-							.add(frameControl.getChildren().indexOf(close),
-									maximize);
+					frameControl.getChildren().add(frameControl.getChildren().indexOf(close), maximize);
+					root.getChildren().add(scalePane);
 					// isResizable: true -> false
 				} else if (oldValue.booleanValue() && !newValue.booleanValue()) {
 					frameControl.getChildren().remove(maximize);
+					root.getChildren().remove(scalePane);
 				}
 			}
 		});
@@ -320,7 +323,7 @@ public class FrameController implements Initializable {
 		// FIXME: Funktioniert nicht, wenn in der Mitte der Frames gedraggt wird.
 		return Math.abs(draggedPosition.getY()) + Math.abs(y) < getVisualBounds()
 				.getHeight() / 15;
-	}
+	}	
 
 	@FXML
 	private void iconifyWindow(ActionEvent event) {
@@ -431,5 +434,41 @@ public class FrameController implements Initializable {
 
 	private boolean isPrimaryMouseButton(MouseEvent me) {
 		return me.getButton() == MouseButton.PRIMARY;
+	}
+	
+	public DoubleProperty xProperty() {
+		return x;
+	}
+	
+	public DoubleProperty yProperty() {
+		return y;
+	}
+	
+	public DoubleProperty widthProperty() {
+		return width;
+	}
+	
+	public DoubleProperty heightProperty() {
+		return height;
+	}
+	
+	public BooleanProperty resizableProperty() {
+		return resizable;
+	}
+	
+	public BooleanProperty maximizedProperty() {
+		return maximized;
+	}
+	
+	public BooleanProperty iconifiedProperty() {
+		return iconified;
+	}
+	
+	public StringProperty titleProperty() {
+		return title;
+	}
+	
+	public String getTitle() {
+		return title.getValueSafe();
 	}
 }

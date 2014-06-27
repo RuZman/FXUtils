@@ -9,6 +9,14 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		new StageDecorator().decorate(primaryStage);
+		primaryStage.setX(5);
+		primaryStage.setY(100);
+		primaryStage.setWidth(700);
+		primaryStage.setHeight(200);
+		primaryStage.setResizable(false);
+		primaryStage.setMaximized(false);
+		primaryStage.setIconified(true);
+		primaryStage.setTitle("ModernFX");
         primaryStage.show();
 	}
 	
