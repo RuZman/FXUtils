@@ -1,4 +1,6 @@
-package de.ruzman.fx;
+package de.ruzman.fx.window;
+
+import java.io.File;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -8,17 +10,26 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 public class StageDecorator {
+	public static final String AERO_STYLE_PATH = "bin/de/ruzman/fx/window/skin/aero/";
+	public static final String GITHUB_STYLE_PATH = "bin/de/ruzman/fx/window/skin/github/";
+	
 	public FrameController decorate(Stage stage) {
+		return decorate(stage, AERO_STYLE_PATH);
+	}
+	
+	public FrameController decorate(Stage stage, String fxmlPath) {
 		try {
 			stage.initStyle(StageStyle.TRANSPARENT);
 			
 			FXMLLoader loader = new FXMLLoader();
-			loader.load(getClass().getResource("Frame.fxml").openStream());
+			loader.load(new File(fxmlPath + "Frame.fxml").toURL().openStream());
 			Scene scene = new Scene(loader.getRoot());
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			scene.getStylesheets().add(new File(fxmlPath + "application.css").toURL().toExternalForm());
 	        scene.setFill(null); 
 	        
 	        FrameController controller = loader.getController();
+
+			controller.getTopBar().maxWidthProperty().bind(stage.widthProperty());
 	        controller.xProperty().setValue(stage.getX());
 	        controller.yProperty().setValue(stage.getY());
 	        controller.widthProperty().setValue(stage.getWidth());
@@ -26,7 +37,7 @@ public class StageDecorator {
 	        controller.resizableProperty().setValue(stage.isResizable());
 	        controller.iconifiedProperty().setValue(stage.isIconified());
 			controller.titleProperty().setValue(stage.getTitle());
-			
+
 			// FIXME: Replace ....
 			stage.maximizedProperty().addListener(new ChangeListener<Boolean>() {
 				@Override
@@ -166,7 +177,7 @@ public class StageDecorator {
 					stage.setTitle(newValue);
 				}
 			});
-			
+						
 	        // FIXME: Scene == ContentPane
 	        stage.setScene(scene);
 

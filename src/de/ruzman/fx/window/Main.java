@@ -1,4 +1,4 @@
-package de.ruzman.fx;
+package de.ruzman.fx.window;
 	
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -16,7 +16,7 @@ public class Main extends Application {
 		primaryStage.setResizable(true);
 		primaryStage.setMaximized(false);
 		primaryStage.setIconified(false);
-		primaryStage.setTitle("ModernFX");
+		primaryStage.setTitle("Neues_Textdokument_(2)");
         primaryStage.show();
 	}
 	

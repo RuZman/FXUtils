@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+
+<?import de.ruzman.fx.window.*?>
+
+<Group fx:id="root" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.ruzman.fx.window.FrameController">
+   <fx:define>
+           <WindowShadowBorder fx:id="windowShadowBorder" northWidth="10" eastWidth="15" southWidth="15" westWidth="10" />
+   </fx:define>
+   <children>
+	   	<BorderPane fx:id="frame">
+	   		<top>
+	   			<StackPane fx:id="topBar" maxHeight="20" onMouseClicked="#maximizeWindowOnDoubleCLick" onMouseDragged="#onWindowDragged" onMousePressed="#activateWindowDragged" onMouseReleased="#deactivateWindowDragged">
+	      			<children> 
+	      				<Label fx:id="titleText" text="${controller.title}" StackPane.alignment="CENTER_LEFT" />
+	         			<HBox fx:id="frameControl">
+	            			<children>
+	            				<Region HBox.hgrow="ALWAYS" />
+	               				<Button fx:id="iconify" minHeight="20" onAction="#iconifyWindow" prefWidth="30" />
+	               				<Button fx:id="maximize" minHeight="20" onAction="#maximizeWindow" prefWidth="28" styleClass="maximize" />
+	               				<Button fx:id="close" minHeight="20" onAction="#closeWindow" prefWidth="48" />
+	           				</children>
+	         			</HBox>
+	      			</children>
+	   			</StackPane>
+	   		</top>
+	   		<center>
+	   			<AnchorPane fx:id="contentPane">
+	   			</AnchorPane>
+	   		</center>
+	   	</BorderPane>
+	   	<Rectangle fx:id="borderPane" height="${frame.height}" width="${frame.width}" />
+	   	<Rectangle fx:id="scalePane" height="${frame.height}" onMouseDragged="#onWindowResize" onMouseMoved="#setResizeCursor" onMousePressed="#activateWindowResize" onMouseReleased="#deactivateWindowResize" width="${frame.width}" />
+   </children>
+</Group>

@@ -1,21 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.effect.*?>
-<?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.shape.Rectangle?>
-<?import javafx.scene.layout.Region?>
-<?import de.ruzman.fx.FrameController?>
-<?import de.ruzman.fx.WindowShadowBorder?>
-<?import javafx.scene.control.Label?>
+<?import javafx.scene.shape.*?>
+
+<?import de.ruzman.fx.window.*?>
 
 <Group fx:id="root" onMousePressed="#activateWindowDragged" onMouseDragged="#onWindowDragged"  onMouseReleased="#deactivateWindowDragged"
-		xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.ruzman.fx.FrameController">
+		xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.ruzman.fx.window.FrameController">
    <fx:define>
            <WindowShadowBorder fx:id="windowShadowBorder" northWidth="7.5" eastWidth="7.5" southWidth="7.5" westWidth="7.5" />
    </fx:define>
@@ -42,6 +37,7 @@
          </effect>
    	</BorderPane>
    	<Rectangle fx:id="scalePane" onMouseMoved="#setResizeCursor" onMousePressed="#activateWindowResize" 
-   					onMouseDragged="#onWindowResize" onMouseReleased="#deactivateWindowResize" />
+   					onMouseDragged="#onWindowResize" onMouseReleased="#deactivateWindowResize"
+   					height="${frame.height}" width="${frame.width}" />
    </children>
 </Group>

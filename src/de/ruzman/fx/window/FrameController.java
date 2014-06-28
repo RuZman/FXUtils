@@ -1,4 +1,4 @@
-package de.ruzman.fx;
+package de.ruzman.fx.window;
 
 import java.net.URL;
 import java.util.EnumSet;
@@ -20,7 +20,6 @@ import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -29,6 +28,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
+import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 
 public class FrameController implements Initializable {
@@ -55,7 +55,7 @@ public class FrameController implements Initializable {
 	protected BooleanProperty maximized = new SimpleBooleanProperty(false);
 	protected BooleanProperty iconified = new SimpleBooleanProperty(false);
 	@FXML protected StringProperty title = new SimpleStringProperty(null, "title");
-	
+
 	@FXML private WindowShadowBorder windowShadowBorder;
 	@FXML private Group root;
 	@FXML private StackPane topBar;
@@ -71,13 +71,7 @@ public class FrameController implements Initializable {
 			windowShadowBorder = new WindowShadowBorder();
 		}
 
-		topBar.prefWidthProperty().bind(frame.widthProperty());
-		scalePane.widthProperty().bind(frame.widthProperty());
-		scalePane.heightProperty().bind(frame.heightProperty());
-
-		maximize.managedProperty().bind(resizable);
 		addMaximizedChangeListener();
-
 		restoreTranslation();
 	}
 
@@ -137,9 +131,9 @@ public class FrameController implements Initializable {
 					scale(oldBounds);
 				}
 			} else {
-				root.getScene().getWindow().setY(y - draggedPosition.getY());
+				getWindow().setY(y - draggedPosition.getY());
 			}
-			root.getScene().getWindow().setX(x - draggedPosition.getX());
+			getWindow().setX(x - draggedPosition.getX());
 		}
 	}
 
@@ -157,7 +151,8 @@ public class FrameController implements Initializable {
 					- getVisualBounds().getWidth() / 15) {
 				isDocked = true;
 				root.setTranslateY(0);
-				scale(new Rectangle2D(getVisualBounds().getWidth() / 2 + windowShadowBorder.getEastWidth(), 0,
+				scale(new Rectangle2D(getVisualBounds().getWidth() / 2
+						+ windowShadowBorder.getEastWidth(), 0,
 						getVisualBounds().getWidth() / 2, getVisualBounds()
 								.getHeight()));
 			}
@@ -242,11 +237,8 @@ public class FrameController implements Initializable {
 	}
 
 	public void closeWindow() {
-		root.getScene()
-				.getWindow()
-				.fireEvent(
-						new WindowEvent(root.getScene().getWindow(),
-								WindowEvent.WINDOW_CLOSE_REQUEST));
+		getWindow().fireEvent(new WindowEvent(getWindow(),
+				WindowEvent.WINDOW_CLOSE_REQUEST));
 	}
 
 	public Rectangle2D getVisualBounds() {
@@ -297,14 +289,21 @@ public class FrameController implements Initializable {
 	}
 
 	private boolean isDockingIntoTop(double y) {
-		// FIXME: Falsch: Seitenwechsel von Top > Out und Out > Top wird nicht berücksichtigt.
-		// FIXME: Funktioniert nicht, wenn in der Mitte der Frames gedraggt wird.
+		// FIXME: Falsch: Seitenwechsel von Top > Out und Out > Top wird nicht
+		// berücksichtigt.
+		// FIXME: Funktioniert nicht, wenn in der Mitte der Frames gedraggt
+		// wird.
 		return Math.abs(draggedPosition.getY()) + Math.abs(y) < getVisualBounds()
 				.getHeight() / 15;
 	}
-	
+
 	private boolean isVerticalResizeDirection() {
-		return direction.contains(ResizeDirection.NORTH) || direction.contains(ResizeDirection.SOUTH);
+		return direction.contains(ResizeDirection.NORTH)
+				|| direction.contains(ResizeDirection.SOUTH);
+	}
+	
+	private Window getWindow() {
+		return root.getScene().getWindow();
 	}
 
 	@FXML
@@ -413,44 +412,49 @@ public class FrameController implements Initializable {
 			deactivateWindowResize();
 		}
 	}
-	
+
 	private boolean isPrimaryMouseButton(MouseEvent me) {
 		return me.getButton() == MouseButton.PRIMARY;
 	}
-	
+
 	public DoubleProperty xProperty() {
 		return x;
 	}
-	
+
 	public DoubleProperty yProperty() {
 		return y;
 	}
-	
+
 	public DoubleProperty widthProperty() {
 		return width;
 	}
-	
+
 	public DoubleProperty heightProperty() {
 		return height;
 	}
-	
+
 	public BooleanProperty resizableProperty() {
 		return resizable;
 	}
-	
+
 	public BooleanProperty maximizedProperty() {
 		return maximized;
 	}
-	
+
 	public BooleanProperty iconifiedProperty() {
 		return iconified;
 	}
-	
+
 	public StringProperty titleProperty() {
 		return title;
 	}
-	
+
 	public String getTitle() {
 		return title.getValueSafe();
 	}
+
+	public StackPane getTopBar() {
+		return topBar;
+	}
+
 }

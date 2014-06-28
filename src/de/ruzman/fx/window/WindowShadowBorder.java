@@ -1,4 +1,4 @@
-package de.ruzman.fx;
+package de.ruzman.fx.window;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
