@@ -8,16 +8,24 @@ public class Main extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) {
-		new StageDecorator().decorate(primaryStage);
-		primaryStage.setX(5);
-		primaryStage.setY(100);
-		primaryStage.setWidth(700);
-		primaryStage.setHeight(200);
-		primaryStage.setResizable(true);
-		primaryStage.setMaximized(false);
-		primaryStage.setIconified(false);
-		primaryStage.setTitle("Neues_Textdokument_(2)");
-        primaryStage.show();
+		try {
+			new StageDecorator(primaryStage);
+			primaryStage.setX(5);
+			primaryStage.setY(100);
+			primaryStage.setMinHeight(80);
+			primaryStage.setMinWidth(80);
+			primaryStage.setWidth(700);
+			primaryStage.setHeight(200);
+			primaryStage.setMaxHeight(800);
+			primaryStage.setMaxWidth(800);
+			primaryStage.setResizable(true);
+			primaryStage.setMaximized(false);
+			primaryStage.setIconified(false);
+			primaryStage.setTitle("Neues_Textdokument_(2)");
+	        primaryStage.show();
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 	
 	public static void main(String[] args) {

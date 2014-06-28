@@ -4,12 +4,6 @@ import java.net.URL;
 import java.util.EnumSet;
 import java.util.ResourceBundle;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -45,16 +39,9 @@ public class FrameController implements Initializable {
 	private State state = State.NONE;
 	protected Rectangle2D oldBounds;
 	protected Point2D draggedPosition;
-	protected boolean isDocked;
 
-	protected DoubleProperty x = new SimpleDoubleProperty(0);
-	protected DoubleProperty y = new SimpleDoubleProperty(0);
-	protected DoubleProperty width = new SimpleDoubleProperty(0);
-	protected DoubleProperty height = new SimpleDoubleProperty(0);
-	protected BooleanProperty resizable = new SimpleBooleanProperty(true);
-	protected BooleanProperty maximized = new SimpleBooleanProperty(false);
-	protected BooleanProperty iconified = new SimpleBooleanProperty(false);
-	@FXML protected StringProperty title = new SimpleStringProperty(null, "title");
+	@FXML
+	protected StageBean stageBean = new StageBean();
 
 	@FXML private WindowShadowBorder windowShadowBorder;
 	@FXML private Group root;
@@ -70,46 +57,48 @@ public class FrameController implements Initializable {
 		if (windowShadowBorder == null) {
 			windowShadowBorder = new WindowShadowBorder();
 		}
-
 		addMaximizedChangeListener();
 		restoreTranslation();
 	}
 
 	private void addMaximizedChangeListener() {
 		// FIXME: Minimize funktioniert nicht
-		maximized.addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable,
-					Boolean oldValue, Boolean newValue) {
-				// isMaximized: false -> true
-				if (!oldValue.booleanValue() && newValue.booleanValue()) {
-					if (state != State.DRAG) {
-						saveOldBounds();
+		stageBean.maximizedProperty().addListener(
+				new ChangeListener<Boolean>() {
+					@Override
+					public void changed(
+							ObservableValue<? extends Boolean> observable,
+							Boolean oldValue, Boolean newValue) {
+						// isMaximized: false -> true
+						if (!oldValue.booleanValue() && newValue.booleanValue()) {
+							if (state != State.DRAG) {
+								saveOldBounds();
+							}
+
+							scale(getVisualBounds());
+
+							root.setTranslateX(0);
+							root.setTranslateY(0);
+							root.getChildren().remove(scalePane);
+
+							maximize.getStyleClass().remove("maximize");
+							maximize.getStyleClass().add("minimize");
+
+							stageBean.setDocked(false);
+							// isMaximized: true -> false
+						} else if (oldValue.booleanValue()
+								&& !newValue.booleanValue()) {
+
+							restoreTranslation();
+							root.getChildren().add(scalePane);
+
+							scale(oldBounds);
+
+							maximize.getStyleClass().add("maximize");
+							maximize.getStyleClass().remove("minimize");
+						}
 					}
-
-					scale(getVisualBounds());
-
-					root.setTranslateX(0);
-					root.setTranslateY(0);
-					root.getChildren().remove(scalePane);
-
-					maximize.getStyleClass().remove("maximize");
-					maximize.getStyleClass().add("minimize");
-
-					isDocked = false;
-					// isMaximized: true -> false
-				} else if (oldValue.booleanValue() && !newValue.booleanValue()) {
-
-					restoreTranslation();
-					root.getChildren().add(scalePane);
-
-					scale(oldBounds);
-
-					maximize.getStyleClass().add("maximize");
-					maximize.getStyleClass().remove("minimize");
-				}
-			}
-		});
+				});
 	}
 
 	public synchronized void activateWindowDragged(double x, double y) {
@@ -121,12 +110,12 @@ public class FrameController implements Initializable {
 	}
 
 	public void onWindowDragged(double x, double y) {
-		if (state == State.DRAG && !maximized.getValue()) {
+		if (state == State.DRAG && !stageBean.isMaximized()) {
 			// FIXME: Logik ist falsch ... funktioniert bei verschiedenen
 			// Dockarten wahrscheinlich nicht.
-			if (isDocked) {
+			if (stageBean.isDocked()) {
 				if (!isDockingIntoTop(y)) {
-					isDocked = false;
+					stageBean.setDocked(false);
 					restoreTranslation();
 					scale(oldBounds);
 				}
@@ -140,16 +129,16 @@ public class FrameController implements Initializable {
 	public void deactivateWindowDragged(double x, double y) {
 		if (state == State.DRAG) {
 			if (y < getVisualBounds().getHeight() / 15) {
-				maximized.setValue(true);
+				stageBean.setMaximized(true);
 			} else if (x < getVisualBounds().getWidth() / 15) {
-				isDocked = true;
+				stageBean.setDocked(true);
 				root.setTranslateX(0);
 				root.setTranslateY(0);
 				scale(new Rectangle2D(0, 0, getVisualBounds().getWidth() / 2,
 						getVisualBounds().getHeight()));
 			} else if (x > getVisualBounds().getWidth()
 					- getVisualBounds().getWidth() / 15) {
-				isDocked = true;
+				stageBean.setDocked(true);
 				root.setTranslateY(0);
 				scale(new Rectangle2D(getVisualBounds().getWidth() / 2
 						+ windowShadowBorder.getEastWidth(), 0,
@@ -163,7 +152,7 @@ public class FrameController implements Initializable {
 	public synchronized void activateWindowResize() {
 		if (state == State.NONE) {
 			state = State.RESIZE;
-			if (isDocked && isVerticalResizeDirection()) {
+			if (stageBean.isDocked() && isVerticalResizeDirection()) {
 				// Do nothing
 			} else {
 				saveOldBounds();
@@ -172,18 +161,18 @@ public class FrameController implements Initializable {
 	}
 
 	private void onVerticalWindowResize(EnumSet<ResizeDirection> direction) {
-		if (resizable.getValue()
+		if (stageBean.isResizable()
 				&& (direction.contains(ResizeDirection.SOUTH) || direction
 						.contains(ResizeDirection.NORTH))) {
-			if (isDocked) {
-				isDocked = false;
+			if (stageBean.isDocked()) {
+				stageBean.setDocked(false);
 				restoreTranslation();
 				scale(oldBounds);
 			} else {
-				isDocked = true;
+				stageBean.setDocked(true);
 				saveOldBounds();
-				scale(new Rectangle2D(x.getValue(), 0, width.getValue(),
-						getVisualBounds().getHeight()));
+				scale(new Rectangle2D(stageBean.getX(), 0,
+						stageBean.getWidth(), getVisualBounds().getHeight()));
 				root.setTranslateY(0);
 			}
 		}
@@ -192,20 +181,20 @@ public class FrameController implements Initializable {
 	public void onWindowResize(EnumSet<ResizeDirection> direction,
 			double screenX, double screenY) {
 		// FIXME: Minimum beim Resize beachten
-		if (resizable.getValue() && state == State.RESIZE) {
-			double px = x.getValue();
-			double py = y.getValue();
-			double w = width.getValue();
-			double h = height.getValue();
+		if (stageBean.isResizable() && state == State.RESIZE) {
+			double px = stageBean.getX();
+			double py = stageBean.getY();
+			double w = stageBean.getWidth();
+			double h = stageBean.getHeight();
 
-			if (isDocked && isVerticalResizeDirection()) {
+			if (stageBean.isDocked() && isVerticalResizeDirection()) {
 				restoreTranslation();
 
 				px = oldBounds.getMinX();
 				py = oldBounds.getMinY();
 				w = oldBounds.getWidth();
 				h = oldBounds.getHeight();
-				isDocked = false;
+				stageBean.setDocked(false);
 			}
 
 			if (direction.contains(ResizeDirection.WEST)) {
@@ -213,7 +202,7 @@ public class FrameController implements Initializable {
 				w = oldBounds.getWidth() + windowShadowBorder.getEastWidth()
 						+ oldBounds.getMinX() - screenX;
 			} else if (direction.contains(ResizeDirection.EAST)) {
-				w = screenX - x.getValue()
+				w = screenX - stageBean.getX()
 						+ windowShadowBorder.getHorizonalWidth();
 			}
 
@@ -222,7 +211,7 @@ public class FrameController implements Initializable {
 				h = oldBounds.getHeight() + windowShadowBorder.getNorthWidth()
 						+ oldBounds.getMinY() - screenY;
 			} else if (direction.contains(ResizeDirection.SOUTH)) {
-				h = screenY - y.getValue()
+				h = screenY - stageBean.getY()
 						+ windowShadowBorder.getVerticalWidth();
 			}
 
@@ -237,48 +226,51 @@ public class FrameController implements Initializable {
 	}
 
 	public void closeWindow() {
-		getWindow().fireEvent(new WindowEvent(getWindow(),
-				WindowEvent.WINDOW_CLOSE_REQUEST));
+		getWindow().fireEvent(
+				new WindowEvent(getWindow(), WindowEvent.WINDOW_CLOSE_REQUEST));
 	}
 
 	public Rectangle2D getVisualBounds() {
 		ObservableList<Screen> screensForRectangle = Screen
-				.getScreensForRectangle(x.getValue(), y.getValue(),
-						width.getValue(), height.getValue());
+				.getScreensForRectangle(stageBean.getX(), stageBean.getY(),
+						stageBean.getWidth(), stageBean.getHeight());
 
 		return screensForRectangle.get(0).getVisualBounds();
 	}
 
 	protected void saveOldBounds() {
-		if (!isDocked) {
-			oldBounds = new Rectangle2D(x.getValue(), y.getValue(),
-					width.getValue(), height.getValue());
+		if (!stageBean.isDocked()) {
+			oldBounds = new Rectangle2D(stageBean.getX(), stageBean.getY(),
+					stageBean.getWidth(), stageBean.getHeight());
 		} else {
 			// FIXME: Resize im Docking-Mode muss oldBounds ?berschreiben.
 		}
 	}
 
 	protected void scale(Rectangle2D bounds) {
-		height.setValue(bounds.getHeight());
-		width.setValue(bounds.getWidth());
-		x.setValue(bounds.getMinX());
-		y.setValue(bounds.getMinY());
+		stageBean.setHeight(bounds.getHeight());
+		stageBean.setWidth(bounds.getWidth());
+		stageBean.setX(bounds.getMinX());
+		stageBean.setY(bounds.getMinY());
 
 		mapFrameToStage();
 	}
 
 	protected void mapFrameToStage() {
-		if (maximized.getValue()) {
-			frame.setPrefSize(width.getValue(), height.getValue());
-		} else if (isDocked) {
+		if (stageBean.isMaximized()) {
+			frame.setPrefSize(stageBean.getWidth(), stageBean.getHeight());
+		} else if (stageBean.isDocked()) {
 			frame.setPrefSize(
-					width.getValue() - windowShadowBorder.getHorizonalWidth(),
+					stageBean.getWidth()
+							- windowShadowBorder.getHorizonalWidth(),
 					getVisualBounds().getHeight());
 		} else {
 			// FIXME: ???
 			frame.setPrefSize(
-					width.getValue() - windowShadowBorder.getNorthWidth() * 3,
-					height.getValue() - windowShadowBorder.getNorthWidth() * 3);
+					stageBean.getWidth() - windowShadowBorder.getNorthWidth()
+							* 3,
+					stageBean.getHeight() - windowShadowBorder.getNorthWidth()
+							* 3);
 		}
 	}
 
@@ -301,31 +293,31 @@ public class FrameController implements Initializable {
 		return direction.contains(ResizeDirection.NORTH)
 				|| direction.contains(ResizeDirection.SOUTH);
 	}
-	
+
 	private Window getWindow() {
 		return root.getScene().getWindow();
 	}
 
 	@FXML
 	private void iconifyWindow(ActionEvent event) {
-		iconified.setValue(true);
+		stageBean.setIconified(true);
 	}
 
 	@FXML
 	private void maximizeWindow(ActionEvent event) {
-		maximized.setValue(!maximized.getValue());
+		stageBean.setMaximized(!stageBean.isMaximized());
 	}
 
 	@FXML
 	private void maximizeWindowOnDoubleCLick(MouseEvent me) {
 		if (isPrimaryMouseButton(me) && me.getClickCount() == 2) {
 			// FIXME: Logik in public-Methode verlagern
-			if (isDocked) {
-				isDocked = false;
+			if (stageBean.isDocked()) {
+				stageBean.setDocked(false);
 				restoreTranslation();
 				scale(oldBounds);
 			} else {
-				maximized.setValue(!maximized.getValue());
+				stageBean.setMaximized(!stageBean.isMaximized());
 			}
 		}
 	}
@@ -368,7 +360,7 @@ public class FrameController implements Initializable {
 		if (me.getSceneY() < resizeArea) {
 			cursorName.append('N');
 			direction.add(ResizeDirection.NORTH);
-		} else if (me.getSceneY() > height.getValue() - resizeArea) {
+		} else if (me.getSceneY() > stageBean.getHeight() - resizeArea) {
 			cursorName.append('S');
 			direction.add(ResizeDirection.SOUTH);
 		}
@@ -376,12 +368,12 @@ public class FrameController implements Initializable {
 		if (me.getSceneX() < resizeArea) {
 			cursorName.append('W');
 			direction.add(ResizeDirection.WEST);
-		} else if (me.getSceneX() > width.getValue() - resizeArea) {
+		} else if (me.getSceneX() > stageBean.getWidth() - resizeArea) {
 			cursorName.append('E');
 			direction.add(ResizeDirection.EAST);
 		}
 
-		if (resizable.getValue() && cursorName.length() != 0) {
+		if (stageBean.isResizable() && cursorName.length() != 0) {
 			scalePane.setCursor(Cursor.cursor(cursorName.append("_RESIZE")
 					.toString()));
 		}
@@ -417,44 +409,12 @@ public class FrameController implements Initializable {
 		return me.getButton() == MouseButton.PRIMARY;
 	}
 
-	public DoubleProperty xProperty() {
-		return x;
-	}
-
-	public DoubleProperty yProperty() {
-		return y;
-	}
-
-	public DoubleProperty widthProperty() {
-		return width;
-	}
-
-	public DoubleProperty heightProperty() {
-		return height;
-	}
-
-	public BooleanProperty resizableProperty() {
-		return resizable;
-	}
-
-	public BooleanProperty maximizedProperty() {
-		return maximized;
-	}
-
-	public BooleanProperty iconifiedProperty() {
-		return iconified;
-	}
-
-	public StringProperty titleProperty() {
-		return title;
-	}
-
-	public String getTitle() {
-		return title.getValueSafe();
-	}
-
 	public StackPane getTopBar() {
 		return topBar;
+	}
+
+	public StageBean getStageBean() {
+		return stageBean;
 	}
 
 }

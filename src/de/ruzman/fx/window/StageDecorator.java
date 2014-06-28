@@ -13,180 +13,179 @@ public class StageDecorator {
 	public static final String AERO_STYLE_PATH = "bin/de/ruzman/fx/window/skin/aero/";
 	public static final String GITHUB_STYLE_PATH = "bin/de/ruzman/fx/window/skin/github/";
 	
-	public FrameController decorate(Stage stage) {
-		return decorate(stage, AERO_STYLE_PATH);
+	public StageDecorator(Stage stage) throws Exception {
+		this(stage, GITHUB_STYLE_PATH);
 	}
 	
-	public FrameController decorate(Stage stage, String fxmlPath) {
-		try {
-			stage.initStyle(StageStyle.TRANSPARENT);
+	public StageDecorator(Stage stage, String fxmlPath) throws Exception {
+		// FIXME: Use selected Style
+		stage.initStyle(StageStyle.TRANSPARENT);
+				
+		FXMLLoader loader = new FXMLLoader();
+		loader.load(new File(fxmlPath + "Frame.fxml").toURL().openStream());
+		FrameController controller = loader.getController();
+		
+		init(stage, controller.getStageBean());
+        bindBiderectional(stage, controller.getStageBean());
+        controller.getTopBar().maxWidthProperty().bind(stage.widthProperty());
+        controller.getStageBean().heightProperty().addListener((a,b,c) -> controller.mapFrameToStage());
+
+		Scene scene = new Scene(loader.getRoot());
+		scene.getStylesheets().add(new File(fxmlPath + "application.css").toURL().toExternalForm());
+        scene.setFill(null);
+        // FIXME: Scene == ContentPane
+        stage.setScene(scene);
+	}
+
+	private void init(Stage stage, StageBean stageBean) throws Exception {
+		stageBean.xProperty().setValue(stage.getX());
+        stageBean.yProperty().setValue(stage.getY());
+        
+        stageBean.widthProperty().setValue(stage.getWidth());
+        stageBean.heightProperty().setValue(stage.getHeight());
+        
+        stageBean.resizableProperty().setValue(stage.isResizable());
+        stageBean.iconifiedProperty().setValue(stage.isIconified());
+        stageBean.titleProperty().setValue(stage.getTitle());
+	}
+	
+	// FIXME: Replace ....
+	private void bindBiderectional(Stage stage, StageBean stageBean) {
+		stage.maximizedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable,
+					Boolean oldValue, Boolean newValue) {
+				stageBean.maximizedProperty().setValue(newValue);
+			}
+		});
+		stageBean.maximizedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends Boolean> observable,
+					Boolean oldValue, Boolean newValue) {
+				stage.setMaximized(newValue);
+			}
+		});
+		
+		stage.iconifiedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable,
+					Boolean oldValue, Boolean newValue) {
+				// FIXME: Klick in der Windowsliste, hat keine Auswirkung?!
+				stageBean.iconifiedProperty().setValue(newValue);
+			}
+		});
+		stageBean.iconifiedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends Boolean> observable,
+					Boolean oldValue, Boolean newValue) {
+				stage.setIconified(newValue);
+			}
+		});
+		
+		stage.resizableProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable,
+					Boolean oldValue, Boolean newValue) {
+				stageBean.resizableProperty().setValue(newValue);
+			}
+		});
+		stageBean.resizableProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends Boolean> observable,
+					Boolean oldValue, Boolean newValue) {
+				stage.setResizable(newValue);
+			}
+		});
+		
+		stage.xProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends Number> observable,
+					Number oldValue, Number newValue) {
+				stageBean.xProperty().setValue(newValue);
+			}
 			
-			FXMLLoader loader = new FXMLLoader();
-			loader.load(new File(fxmlPath + "Frame.fxml").toURL().openStream());
-			Scene scene = new Scene(loader.getRoot());
-			scene.getStylesheets().add(new File(fxmlPath + "application.css").toURL().toExternalForm());
-	        scene.setFill(null); 
-	        
-	        FrameController controller = loader.getController();
-
-			controller.getTopBar().maxWidthProperty().bind(stage.widthProperty());
-	        controller.xProperty().setValue(stage.getX());
-	        controller.yProperty().setValue(stage.getY());
-	        controller.widthProperty().setValue(stage.getWidth());
-	        controller.heightProperty().setValue(stage.getHeight());
-	        controller.resizableProperty().setValue(stage.isResizable());
-	        controller.iconifiedProperty().setValue(stage.isIconified());
-			controller.titleProperty().setValue(stage.getTitle());
-
-			// FIXME: Replace ....
-			stage.maximizedProperty().addListener(new ChangeListener<Boolean>() {
-				@Override
-				public void changed(ObservableValue<? extends Boolean> observable,
-						Boolean oldValue, Boolean newValue) {
-					controller.maximized.setValue(newValue);
-				}
-			});
-			controller.maximized.addListener(new ChangeListener<Boolean>() {
-				@Override
-				public void changed(
-						ObservableValue<? extends Boolean> observable,
-						Boolean oldValue, Boolean newValue) {
-					stage.setMaximized(newValue);
-				}
-			});
+		});
+		stageBean.xProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends Number> observable,
+					Number oldValue, Number newValue) {
+				stage.setX(newValue.doubleValue());
+			}
 			
-			stage.iconifiedProperty().addListener(new ChangeListener<Boolean>() {
-				@Override
-				public void changed(ObservableValue<? extends Boolean> observable,
-						Boolean oldValue, Boolean newValue) {
-					// FIXME: Klick in der Windowsliste, hat keine Auswirkung?!
-					controller.iconified.setValue(newValue);
-				}
-			});
-			controller.iconified.addListener(new ChangeListener<Boolean>() {
-				@Override
-				public void changed(
-						ObservableValue<? extends Boolean> observable,
-						Boolean oldValue, Boolean newValue) {
-					stage.setIconified(newValue);
-				}
-			});
+		});
+		stage.yProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends Number> observable,
+					Number oldValue, Number newValue) {
+				stageBean.yProperty().setValue(newValue);
+			}
 			
-			stage.resizableProperty().addListener(new ChangeListener<Boolean>() {
-				@Override
-				public void changed(ObservableValue<? extends Boolean> observable,
-						Boolean oldValue, Boolean newValue) {
-					controller.resizable.setValue(newValue);
-				}
-			});
-			controller.resizable.addListener(new ChangeListener<Boolean>() {
-				@Override
-				public void changed(
-						ObservableValue<? extends Boolean> observable,
-						Boolean oldValue, Boolean newValue) {
-					stage.setResizable(newValue);
-				}
-			});
+		});
+		stageBean.yProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends Number> observable,
+					Number oldValue, Number newValue) {
+				stage.setY(newValue.doubleValue());
+			}
 			
-			stage.xProperty().addListener(new ChangeListener<Number>() {
-				@Override
-				public void changed(
-						ObservableValue<? extends Number> observable,
-						Number oldValue, Number newValue) {
-					controller.x.setValue(newValue);
-				}
-				
-			});
-			controller.x.addListener(new ChangeListener<Number>() {
-				@Override
-				public void changed(
-						ObservableValue<? extends Number> observable,
-						Number oldValue, Number newValue) {
-					stage.setX(newValue.doubleValue());
-				}
-				
-			});
-			stage.yProperty().addListener(new ChangeListener<Number>() {
-				@Override
-				public void changed(
-						ObservableValue<? extends Number> observable,
-						Number oldValue, Number newValue) {
-					controller.y.setValue(newValue);
-				}
-				
-			});
-			controller.y.addListener(new ChangeListener<Number>() {
-				@Override
-				public void changed(
-						ObservableValue<? extends Number> observable,
-						Number oldValue, Number newValue) {
-					stage.setY(newValue.doubleValue());
-				}
-				
-			});
-			stage.widthProperty().addListener(new ChangeListener<Number>() {
-				@Override
-				public void changed(
-						ObservableValue<? extends Number> observable,
-						Number oldValue, Number newValue) {
-					controller.width.setValue(newValue);
-				}
-				
-			});
-			controller.width.addListener(new ChangeListener<Number>() {
-				@Override
-				public void changed(
-						ObservableValue<? extends Number> observable,
-						Number oldValue, Number newValue) {
-					stage.setWidth(newValue.doubleValue());
-					controller.mapFrameToStage();
-				}
-			});
-			stage.heightProperty().addListener(new ChangeListener<Number>() {
-				@Override
-				public void changed(
-						ObservableValue<? extends Number> observable,
-						Number oldValue, Number newValue) {
-					controller.height.setValue(newValue);
-				}
-				
-			});
-			controller.height.addListener(new ChangeListener<Number>() {
-				@Override
-				public void changed(
-						ObservableValue<? extends Number> observable,
-						Number oldValue, Number newValue) {
-					stage.setHeight(newValue.doubleValue());
-					controller.mapFrameToStage();
-				}
-			});
-			stage.titleProperty().addListener(new ChangeListener<String>() {
-				@Override
-				public void changed(
-						ObservableValue<? extends String> observable,
-						String oldValue, String newValue) {
-					controller.title.setValue(newValue);
-				}
-				
-			});
-			controller.title.addListener(new ChangeListener<String>() {
-				@Override
-				public void changed(
-						ObservableValue<? extends String> observable,
-						String oldValue, String newValue) {
-					stage.setTitle(newValue);
-				}
-			});
-						
-	        // FIXME: Scene == ContentPane
-	        stage.setScene(scene);
-
-
-			return controller;
-		} catch(Exception e) { 
-			e.printStackTrace();
-		}
-
-		return null;
+		});
+		stage.widthProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends Number> observable,
+					Number oldValue, Number newValue) {
+				stageBean.widthProperty().setValue(newValue);
+			}
+			
+		});
+		stageBean.widthProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends Number> observable,
+					Number oldValue, Number newValue) {
+				stage.setWidth(newValue.doubleValue());
+			}
+		});
+		stage.heightProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends Number> observable,
+					Number oldValue, Number newValue) {
+				stageBean.heightProperty().setValue(newValue);
+			}
+			
+		});
+		stageBean.heightProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends Number> observable,
+					Number oldValue, Number newValue) {
+				stage.setHeight(newValue.doubleValue());
+			}
+		});
+		stage.titleProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends String> observable,
+					String oldValue, String newValue) {
+				stageBean.titleProperty().setValue(newValue);
+			}
+			
+		});
+		stageBean.titleProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends String> observable,
+					String oldValue, String newValue) {
+				stage.setTitle(newValue);
+			}
+		});
 	}
 }
