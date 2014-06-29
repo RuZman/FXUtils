@@ -2,20 +2,32 @@ package de.ruzman.fx.window;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.stage.StageStyle;
 
 public class StageBean {
+	private ObjectProperty<StageStyle> stageStyle = new SimpleObjectProperty<>(StageStyle.DECORATED);	
+	
 	private DoubleProperty x = new SimpleDoubleProperty(0);
 	private DoubleProperty y = new SimpleDoubleProperty(0);
+	
 	private DoubleProperty width = new SimpleDoubleProperty(0);
 	private DoubleProperty height = new SimpleDoubleProperty(0);
+	private DoubleProperty minHeight = new SimpleDoubleProperty(0);
+	private DoubleProperty minWidth = new SimpleDoubleProperty(0);
+	private DoubleProperty maxHeight = new SimpleDoubleProperty(0);
+	private DoubleProperty maxWidth = new SimpleDoubleProperty(0);
+	
 	private BooleanProperty docked = new SimpleBooleanProperty(false);
 	private BooleanProperty resizable = new SimpleBooleanProperty(true);
 	private BooleanProperty maximized = new SimpleBooleanProperty(false);
 	private BooleanProperty iconified = new SimpleBooleanProperty(false);
+
 	private StringProperty title = new SimpleStringProperty("");
 
 	public double getX() {
@@ -41,7 +53,7 @@ public class StageBean {
 	public DoubleProperty yProperty() {
 		return y;
 	}
-
+	
 	public double getWidth() {
 		return width.get();
 	}
@@ -65,6 +77,54 @@ public class StageBean {
 	public DoubleProperty heightProperty() {
 		return height;
 	}
+	
+	public double getMinWidth() {
+		return minWidth.get();
+	}
+
+	public void setMinWidth(double minWidth) {
+		this.minWidth.set(minWidth);
+	}
+
+	public DoubleProperty minWidthProperty() {
+		return minWidth;
+	}
+
+	public double getMinHeight() {
+		return minHeight.get();
+	}
+
+	public void setMinHeight(double minHeight) {
+		this.minHeight.set(minHeight);
+	}
+
+	public DoubleProperty minHeightProperty() {
+		return minHeight;
+	}
+	
+	public double getMaxWidth() {
+		return maxWidth.get();
+	}
+
+	public void setMaxWidth(double maxWidth) {
+		this.maxWidth.set(maxWidth);
+	}
+
+	public DoubleProperty maxWidthProperty() {
+		return maxWidth;
+	}
+
+	public double getMaxHeight() {
+		return maxHeight.get();
+	}
+
+	public void setMaxHeight(double maxHeight) {
+		this.maxHeight.set(maxHeight);
+	}
+
+	public DoubleProperty maxHeightProperty() {
+		return maxHeight;
+	}
 
 	public boolean getResizable() {
 		return resizable.get();
@@ -87,7 +147,7 @@ public class StageBean {
 	}
 
 	public boolean isMaximized() {
-		return iconified.get();
+		return maximized.get();
 	}
 
 	public void setMaximized(boolean maximized) {
@@ -140,5 +200,17 @@ public class StageBean {
 
 	public StringProperty titleProperty() {
 		return title;
+	}
+	
+	public StageStyle getStageStyle() {
+		return stageStyle.get();
+	}
+
+	public void setStageStyle(StageStyle stageStyle) {
+		this.stageStyle.set(stageStyle);
+	}
+
+	public ObjectProperty<StageStyle> stageStyleProperty() {
+		return stageStyle;
 	}
 }

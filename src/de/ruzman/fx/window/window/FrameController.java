@@ -22,6 +22,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
+import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 
@@ -40,8 +41,7 @@ public class FrameController implements Initializable {
 	protected Rectangle2D oldBounds;
 	protected Point2D draggedPosition;
 
-	@FXML
-	protected StageBean stageBean = new StageBean();
+	@FXML protected StageBean stageBean = new StageBean();
 
 	@FXML private WindowShadowBorder windowShadowBorder;
 	@FXML private Group root;
@@ -54,17 +54,21 @@ public class FrameController implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		if (windowShadowBorder == null) {
+		if(windowShadowBorder == null) {
 			windowShadowBorder = new WindowShadowBorder();
 		}
+		
 		addMaximizedChangeListener();
 		restoreTranslation();
+		
+		stageBean.widthProperty().addListener((a,b,c) -> mapFrameWidth());
+		stageBean.heightProperty().addListener((a,b,c) -> mapFrameHeight());
 	}
 
 	private void addMaximizedChangeListener() {
-		// FIXME: Minimize funktioniert nicht
 		stageBean.maximizedProperty().addListener(
 				new ChangeListener<Boolean>() {
+					
 					@Override
 					public void changed(
 							ObservableValue<? extends Boolean> observable,
@@ -75,10 +79,12 @@ public class FrameController implements Initializable {
 								saveOldBounds();
 							}
 
-							scale(getVisualBounds());
-
 							root.setTranslateX(0);
 							root.setTranslateY(0);
+							stageBean.setX(0);
+							stageBean.setY(0);
+							scale(getVisualBounds());
+							
 							root.getChildren().remove(scalePane);
 
 							maximize.getStyleClass().remove("maximize");
@@ -134,22 +140,28 @@ public class FrameController implements Initializable {
 				stageBean.setDocked(true);
 				root.setTranslateX(0);
 				root.setTranslateY(0);
-				scale(new Rectangle2D(0, 0, getVisualBounds().getWidth() / 2,
-						getVisualBounds().getHeight()));
+				scale(0, 0, getVisualBounds().getWidth() / 2, getVisualBounds()
+						.getHeight());
+				stageBean.setX(0);
+				stageBean.setY(0);
 			} else if (x > getVisualBounds().getWidth()
 					- getVisualBounds().getWidth() / 15) {
 				stageBean.setDocked(true);
 				root.setTranslateY(0);
-				scale(new Rectangle2D(getVisualBounds().getWidth() / 2
+				scale(getVisualBounds().getWidth() / 2
 						+ windowShadowBorder.getEastWidth(), 0,
 						getVisualBounds().getWidth() / 2, getVisualBounds()
-								.getHeight()));
+								.getHeight());
+				stageBean.setX(getVisualBounds().getWidth()
+						- stageBean.getWidth()
+						+ windowShadowBorder.getEastWidth());
+				stageBean.setY(0);
 			}
 			state = State.NONE;
 		}
 	}
 
-	public synchronized void activateWindowResize() {
+	public synchronized void activateWindowResize(double screenX, double screenY) {
 		if (state == State.NONE) {
 			state = State.RESIZE;
 			if (stageBean.isDocked() && isVerticalResizeDirection()) {
@@ -157,6 +169,7 @@ public class FrameController implements Initializable {
 			} else {
 				saveOldBounds();
 			}
+			draggedPosition = new Point2D(screenX, screenY);
 		}
 	}
 
@@ -171,52 +184,64 @@ public class FrameController implements Initializable {
 			} else {
 				stageBean.setDocked(true);
 				saveOldBounds();
-				scale(new Rectangle2D(stageBean.getX(), 0,
-						stageBean.getWidth(), getVisualBounds().getHeight()));
+				// FIX: Wenn maxHight überschritten wird, dann ignoriert scale
+				// die Y-Verschiebung
+				stageBean.setY(0);
 				root.setTranslateY(0);
+				scale(stageBean.getX(), 0, stageBean.getWidth(),
+						getVisualBounds().getHeight());
 			}
 		}
 	}
 
 	public void onWindowResize(EnumSet<ResizeDirection> direction,
 			double screenX, double screenY) {
-		// FIXME: Minimum beim Resize beachten
-		if (stageBean.isResizable() && state == State.RESIZE) {
-			double px = stageBean.getX();
-			double py = stageBean.getY();
-			double w = stageBean.getWidth();
-			double h = stageBean.getHeight();
+		// FIXME: Resize, wenn seitlich angedockt ist.
 
-			if (stageBean.isDocked() && isVerticalResizeDirection()) {
-				restoreTranslation();
-
-				px = oldBounds.getMinX();
-				py = oldBounds.getMinY();
-				w = oldBounds.getWidth();
-				h = oldBounds.getHeight();
-				stageBean.setDocked(false);
-			}
-
-			if (direction.contains(ResizeDirection.WEST)) {
-				px = screenX - windowShadowBorder.getEastWidth();
-				w = oldBounds.getWidth() + windowShadowBorder.getEastWidth()
-						+ oldBounds.getMinX() - screenX;
-			} else if (direction.contains(ResizeDirection.EAST)) {
-				w = screenX - stageBean.getX()
-						+ windowShadowBorder.getHorizonalWidth();
-			}
-
-			if (direction.contains(ResizeDirection.NORTH)) {
-				py = screenY - windowShadowBorder.getNorthWidth();
-				h = oldBounds.getHeight() + windowShadowBorder.getNorthWidth()
-						+ oldBounds.getMinY() - screenY;
-			} else if (direction.contains(ResizeDirection.SOUTH)) {
-				h = screenY - stageBean.getY()
-						+ windowShadowBorder.getVerticalWidth();
-			}
-
-			scale(new Rectangle2D(px, py, w, h));
+		if (!hasMouseMoved(screenX, screenY) || !stageBean.isResizable()
+				|| state != State.RESIZE) {
+			return;
 		}
+
+		double px = stageBean.getX();
+		double py = stageBean.getY();
+		double w = stageBean.getWidth();
+		double h = stageBean.getHeight();
+
+		if (stageBean.isDocked() && isVerticalResizeDirection()) {
+			restoreTranslation();
+
+			px = oldBounds.getMinX();
+			py = oldBounds.getMinY();
+			w = oldBounds.getWidth();
+			h = oldBounds.getHeight();
+			stageBean.setDocked(false);
+		}
+
+		if (direction.contains(ResizeDirection.WEST)) {
+			px = screenX - windowShadowBorder.getEastWidth();
+			w = oldBounds.getWidth() + windowShadowBorder.getEastWidth()
+					+ oldBounds.getMinX() - screenX;
+		} else if (direction.contains(ResizeDirection.EAST)) {
+			w = screenX - stageBean.getX()
+					+ windowShadowBorder.getHorizonalWidth();
+		}
+
+		if (direction.contains(ResizeDirection.NORTH)) {
+			py = screenY - windowShadowBorder.getNorthWidth();
+			h = oldBounds.getHeight() + windowShadowBorder.getNorthWidth()
+					+ oldBounds.getMinY() - screenY;
+		} else if (direction.contains(ResizeDirection.SOUTH)) {
+			h = screenY - stageBean.getY()
+					+ windowShadowBorder.getVerticalWidth();
+		}
+
+		scale(px, py, w, h);
+	}
+
+	private boolean hasMouseMoved(double screenX, double screenY) {
+		return ((int) draggedPosition.getX()) != ((int) screenX)
+				|| ((int) draggedPosition.getY()) != ((int) screenY);
 	}
 
 	public void deactivateWindowResize() {
@@ -233,8 +258,7 @@ public class FrameController implements Initializable {
 	public Rectangle2D getVisualBounds() {
 		ObservableList<Screen> screensForRectangle = Screen
 				.getScreensForRectangle(stageBean.getX(), stageBean.getY(),
-						stageBean.getWidth(), stageBean.getHeight());
-
+						stageBean.getWidth(), stageBean.getHeight());		
 		return screensForRectangle.get(0).getVisualBounds();
 	}
 
@@ -247,37 +271,59 @@ public class FrameController implements Initializable {
 		}
 	}
 
-	protected void scale(Rectangle2D bounds) {
-		stageBean.setHeight(bounds.getHeight());
-		stageBean.setWidth(bounds.getWidth());
-		stageBean.setX(bounds.getMinX());
-		stageBean.setY(bounds.getMinY());
-
-		mapFrameToStage();
-	}
-
-	protected void mapFrameToStage() {
-		if (stageBean.isMaximized()) {
-			frame.setPrefSize(stageBean.getWidth(), stageBean.getHeight());
-		} else if (stageBean.isDocked()) {
-			frame.setPrefSize(
-					stageBean.getWidth()
-							- windowShadowBorder.getHorizonalWidth(),
-					getVisualBounds().getHeight());
-		} else {
-			// FIXME: ???
-			frame.setPrefSize(
-					stageBean.getWidth() - windowShadowBorder.getNorthWidth()
-							* 3,
-					stageBean.getHeight() - windowShadowBorder.getNorthWidth()
-							* 3);
+	public void scale(double x, double y, double width, double height) {
+		if (width >= 0 && height >= 0) {
+			scale(new Rectangle2D(x, y, width, height));
 		}
 	}
 
+	protected void scale(Rectangle2D bounds) {
+		// FIXME: Schatten stimmt nicht immer, wenn min/max Größe
+		// unter/überschritten wird.
+		double newHeight = bounds.getHeight();
+		double newWidth = bounds.getWidth();
+		double newX = bounds.getMinX();
+		double newY = bounds.getMinY();		
+
+		// FIXME: Abhängig von Style, wird maxGröße anders gehändelt.
+		// FIXME: In den Properties regeln und nicht hier.
+		//if(!stageBean.isMaximized() || (stageBean.isMaximized() && stageBean.getStageStyle() == StageStyle.DECORATED)) {
+			if (newHeight > stageBean.getMaxHeight()) {
+				newHeight = stageBean.getMaxHeight();
+				newY = stageBean.getY();
+			} else if (newHeight < stageBean.getMinHeight()) {
+				newHeight = stageBean.getMinHeight();
+				newY = stageBean.getY();
+			}
+	
+			if (newWidth > stageBean.getMaxWidth()) {
+				newWidth = stageBean.getMaxWidth();
+				newX = stageBean.getX();
+			} else if (newWidth < stageBean.getMinWidth()) {
+				newWidth = stageBean.getMinWidth();
+				newX = stageBean.getX();
+			}
+		//}
+		
+		stageBean.setHeight(newHeight);
+		stageBean.setWidth(newWidth);
+		stageBean.setX(newX);
+		stageBean.setY(newY);
+	}
+	
+	protected void mapFrameWidth() {
+		// FIXME: Schatten wird nicht korrekt eingerechnet:
+		frame.setPrefWidth(stageBean.getWidth()-windowShadowBorder.getVerticalWidth());
+	}
+	
+	protected void mapFrameHeight() {
+		// FIXME: Schatten wird nicht korrekt eingerechnet:
+		frame.setPrefHeight(stageBean.getHeight()-windowShadowBorder.getHorizonalWidth());
+	}
+	
 	protected void restoreTranslation() {
 		root.setTranslateX(windowShadowBorder.getWestWidth());
 		root.setTranslateY(windowShadowBorder.getNorthWidth());
-		mapFrameToStage();
 	}
 
 	private boolean isDockingIntoTop(double y) {
@@ -385,7 +431,7 @@ public class FrameController implements Initializable {
 			if (me.getClickCount() == 2) {
 				onVerticalWindowResize(direction);
 			} else {
-				activateWindowResize();
+				activateWindowResize(me.getScreenX(), me.getScreenY());
 			}
 			me.consume();
 		}

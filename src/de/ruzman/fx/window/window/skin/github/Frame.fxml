@@ -19,7 +19,7 @@
    		<top>
    			<StackPane fx:id="topBar" onMouseClicked="#maximizeWindowOnDoubleCLick">
       			<HBox fx:id="frameControl" StackPane.alignment="TOP_RIGHT">
-      				<Label fx:id="titleText" text="${controller.title}"/>
+      				<Label fx:id="titleText" text="${controller.stageBean.title}"/>
       				<Region HBox.hgrow="ALWAYS" />
          			<Button fx:id="iconify" prefHeight="25" prefWidth="30" onAction="#iconifyWindow" />
          			<Button fx:id="maximize" prefHeight="25" prefWidth="30" styleClass="maximize" onAction="#maximizeWindow" />
