@@ -16,6 +16,8 @@ public class StageBean {
 	private DoubleProperty x = new SimpleDoubleProperty(0);
 	private DoubleProperty y = new SimpleDoubleProperty(0);
 	
+	private DoubleProperty totalWidth = new SimpleDoubleProperty(0);
+	private DoubleProperty totalHeight = new SimpleDoubleProperty(0);
 	private DoubleProperty width = new SimpleDoubleProperty(0);
 	private DoubleProperty height = new SimpleDoubleProperty(0);
 	private DoubleProperty minHeight = new SimpleDoubleProperty(0);
@@ -29,7 +31,7 @@ public class StageBean {
 	private BooleanProperty iconified = new SimpleBooleanProperty(false);
 
 	private StringProperty title = new SimpleStringProperty("");
-
+	
 	public double getX() {
 		return x.get();
 	}
@@ -52,6 +54,30 @@ public class StageBean {
 
 	public DoubleProperty yProperty() {
 		return y;
+	}
+	
+	public double getTotalWidth() {
+		return totalWidth.get();
+	}
+
+	public void setTotalWidth(double totalWidth) {
+		this.totalWidth.set(totalWidth);
+	}
+
+	public DoubleProperty totalWidthProperty() {
+		return totalWidth;
+	}
+
+	public double getTotalHeight() {
+		return totalHeight.get();
+	}
+
+	public void setTotalHeight(double totalHeight) {
+		this.totalHeight.set(totalHeight);
+	}
+
+	public DoubleProperty totalHeightProperty() {
+		return totalHeight;
 	}
 	
 	public double getWidth() {

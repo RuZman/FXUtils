@@ -38,8 +38,9 @@ public class StageDecorator {
 		
 		init(stage, controller.getStageBean());
 		bindBiderectional(stage, controller.getStageBean());
-		controller.getTopBar().maxWidthProperty().bind(stage.widthProperty());
-
+		stage.setWidth(controller.getStageBean().getTotalWidth());
+		stage.setHeight(controller.getStageBean().getTotalHeight());
+		
 		Scene scene = new Scene(loader.getRoot());
 		scene.getStylesheets()
 				.add(new File(fxmlPath + "application.css").toURL()
@@ -71,9 +72,6 @@ public class StageDecorator {
 		bind(stage.xProperty(), stageBean.xProperty());
 		bind(stage.yProperty(), stageBean.yProperty());
 		
-		// Unfixable: Schatten reduziert die Größe der Stage.
-		bind(stage.widthProperty(), stageBean.widthProperty());
-		bind(stage.heightProperty(), stageBean.heightProperty());
 		// FIXME: minGröße könnte problemeatisch werden, wenn im Layout-Code was größeres festgelegt ist ..
 		bind(stage.minWidthProperty(), stageBean.minWidthProperty());
 		bind(stage.minHeightProperty(), stageBean.minHeightProperty());
@@ -92,9 +90,9 @@ public class StageDecorator {
 		stageBean.yProperty().addListener(
 				(a, b, newValue) -> stage.setY(newValue.doubleValue()));
 
-		stageBean.widthProperty().addListener(
+		stageBean.totalWidthProperty().addListener(
 				(a, b, newValue) -> stage.setWidth(newValue.doubleValue()));
-		stageBean.heightProperty().addListener(
+		stageBean.totalHeightProperty().addListener(
 				(a, b, newValue) -> stage.setHeight(newValue.doubleValue()));
 
 		stageBean.minWidthProperty().addListener(

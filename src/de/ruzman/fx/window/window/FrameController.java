@@ -61,8 +61,15 @@ public class FrameController implements Initializable {
 		addMaximizedChangeListener();
 		restoreTranslation();
 		
-		stageBean.widthProperty().addListener((a,b,c) -> mapFrameWidth());
-		stageBean.heightProperty().addListener((a,b,c) -> mapFrameHeight());
+		if(topBar != null) {
+			topBar.maxWidthProperty().bind(stageBean.widthProperty());
+		}
+		
+		frame.prefHeightProperty().bind(stageBean.heightProperty());
+		frame.prefWidthProperty().bind(stageBean.widthProperty());
+
+		stageBean.widthProperty().addListener((a,b, c) -> calcTotalWidth());
+		stageBean.heightProperty().addListener((a,b, c) -> calcTotalHeight());
 	}
 
 	private void addMaximizedChangeListener() {
@@ -304,22 +311,23 @@ public class FrameController implements Initializable {
 				newX = stageBean.getX();
 			}
 		//}
-		
+
 		stageBean.setHeight(newHeight);
 		stageBean.setWidth(newWidth);
 		stageBean.setX(newX);
 		stageBean.setY(newY);
 	}
 	
-	protected void mapFrameWidth() {
-		// FIXME: Schatten wird nicht korrekt eingerechnet:
-		frame.setPrefWidth(stageBean.getWidth()-windowShadowBorder.getVerticalWidth());
+	protected void calcTotalWidth() {
+		System.out.println(stageBean.getWidth() + " -> " + (stageBean.getWidth()+windowShadowBorder.getHorizonalWidth()));
+		
+		stageBean.setTotalWidth(stageBean.getWidth()+windowShadowBorder.getHorizonalWidth());
 	}
 	
-	protected void mapFrameHeight() {
-		// FIXME: Schatten wird nicht korrekt eingerechnet:
-		frame.setPrefHeight(stageBean.getHeight()-windowShadowBorder.getHorizonalWidth());
+	protected void calcTotalHeight() {
+		stageBean.setTotalHeight(stageBean.getHeight()+windowShadowBorder.getVerticalWidth());
 	}
+	
 	
 	protected void restoreTranslation() {
 		root.setTranslateX(windowShadowBorder.getWestWidth());
